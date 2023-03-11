@@ -57,12 +57,12 @@ model Video {
 }
 
 model Msg {
-    id                   String @id @default(auto()) @map("_id") @db.ObjectId
-    videoId              Int    @unique @db.Int
+    id                   String  @id @default(auto()) @map("_id") @db.ObjectId
+    videoId              Int     @unique @db.Int
     message              String
-    commenter            String
+    commenter            String?
     contentOffsetSeconds Int
-    Video                Video  @relation(fields: [videoId], references: [videoId])
+    Video                Video   @relation(fields: [videoId], references: [videoId])
 }
 
 model Session {

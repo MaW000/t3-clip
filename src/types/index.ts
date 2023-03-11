@@ -36,7 +36,7 @@ export interface VideoComment {
       text: string;
       type: string;
     }>;
-    userBadges: any[]; // replace `any` with the correct type for your use case
+    userBadges: []; // replace `any` with the correct type for your use case
     userColor: string;
     __typename: string;
   };
@@ -45,7 +45,7 @@ export interface VideoComment {
 export interface VideoCommentEdge {
   cursor: string;
   node: VideoComment;
-  __typename: any;
+  __typename: string;
 }
 
 export interface TwitchVideoCommentResponse {

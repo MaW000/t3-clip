@@ -10,21 +10,31 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+import { pusher } from '~/utils/pusher'
 
 export const exampleRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ videoId: z.string() }))
+  getVideo: publicProcedure
+    .input(z.object({ videoId: z.number() }))
     .query(async ({ input, ctx }) => {
       let comments: VideoCommentEdge[] = [];
+      let vidLength: number
       let lastSecond = 0.0;
       let lastCommentCursor = "";
       let firstSecond: number;
-      
-      const toggle = await ctx.prisma.video.findFirst({ where: { videoId: +input.videoId } })
+
+      const toggle = await ctx.prisma.video.findFirst({ where: { videoId: input.videoId }, select: { complete: true } })
+
       if (!toggle) {
         await VideoDataFetch()
         await getComments()
+        return { fetch: `Video has started fetching comments` };
+
+      } else if (!toggle.complete) {
+        return { fetch: `video is saving` };
+      } else {
+        return { saved: `video is saved` };
       }
+
       async function VideoDataFetch() {
         function convertToSeconds(str: string) {
           const timeArr = str.split(/[hms]/) as [string, string, string]; // use type assertion to tell the compiler that str is a string
@@ -47,7 +57,7 @@ export const exampleRouter = createTRPCRouter({
         );
         const videoResult = (await videoFetch.json()) as TwitchVideoResponse;
         const data = {
-          videoId: +input.videoId,
+          videoId: input.videoId,
           userName: videoResult.data[0]?.user_name,
           title: videoResult.data[0]?.title,
           thumbnail: videoResult.data[0]?.thumbnail_url,
@@ -58,16 +68,17 @@ export const exampleRouter = createTRPCRouter({
           url: videoResult.data[0]?.url
         }
         const time = videoResult.data[0]?.duration;
-        let b = await ctx.prisma.video.create({ data: data })
+        await ctx.prisma.video.create({ data: data })
 
         if (!time) {
           // handle the case when time is undefined
           throw new Error("Time is undefined");
         }
 
-        const vidLength = convertToSeconds(time);
+        const vidLengthS = convertToSeconds(time);
         // console.log(seconds)
-        firstSecond = vidLength
+        vidLength = vidLengthS
+        firstSecond = vidLengthS
         await getComments()
       }
 
@@ -151,12 +162,15 @@ export const exampleRouter = createTRPCRouter({
         }
 
         while (lastSecond < firstSecond) {
-          const [startComments, endComments] = await Promise.all([headComments(), tailComments()]);
 
+          const percent = 100 - ((firstSecond - lastSecond) / vidLength * 100)
+          await pusher.trigger(`${input.videoId}`, "update", percent);
+
+          const [startComments, endComments] = await Promise.all([headComments(), tailComments()]);
           if (startComments && endComments) {
             const mergedResults = comments.concat(...startComments, ...endComments)
             comments.push(...mergedResults)
-            if (comments.length > 100) {
+            if (comments.length > 1000) {
               const uniqueComments = comments.reduce(
                 (result: UniqueCommentsResult, comment) => {
                   const commentId = comment.node.id;
@@ -171,9 +185,9 @@ export const exampleRouter = createTRPCRouter({
                     }
                     const formattedComment = {
                       message: msg,
-                      commenter: comment.node.commenter.displayName,
+                      commenter: comment.node.commenter?.displayName,
                       contentOffsetSeconds: comment.node.contentOffsetSeconds,
-                      videoId: +input.videoId
+                      videoId: input.videoId
                     };
                     result.comments.push(formattedComment);
                   }
@@ -196,6 +210,7 @@ export const exampleRouter = createTRPCRouter({
 
           }
         }
+
         if (comments.length > 0) {
           const uniqueComments = comments.reduce(
             (result: UniqueCommentsResult, comment) => {
@@ -213,7 +228,7 @@ export const exampleRouter = createTRPCRouter({
                   message: msg,
                   commenter: comment.node.commenter.displayName,
                   contentOffsetSeconds: comment.node.contentOffsetSeconds,
-                  videoId: +input.videoId
+                  videoId: input.videoId
                 };
                 result.comments.push(formattedComment);
               }
@@ -233,27 +248,31 @@ export const exampleRouter = createTRPCRouter({
           })
           comments = []
         }
+        await ctx.prisma.video.update({
+          where: {
+            videoId: input.videoId
+          },
+          data: {
+            complete: true
+          }
+        })
       }
-
-      return {
-        greeting: `Hello ${input.videoId}`,
-      };
     }),
 
   getAll: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.example.findMany();
   }),
 
-  deleteAll: publicProcedure.input(z.object({ videoId: z.string() })).mutation(async ({ ctx, input }) => {
+  deleteAll: publicProcedure.input(z.object({ videoId: z.number() })).mutation(async ({ ctx, input }) => {
 
-    const a = await ctx.prisma.msg.deleteMany({
+    await ctx.prisma.msg.deleteMany({
       where: {
-        videoId: +input.videoId
+        videoId: input.videoId
       }
     })
-    const b = await ctx.prisma.video.deleteMany({
+    await ctx.prisma.video.deleteMany({
       where: {
-        videoId: +input.videoId
+        videoId: input.videoId
       },
     })
 
