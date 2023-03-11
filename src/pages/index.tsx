@@ -6,8 +6,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "~/utils/api";
 import { TitleDescription, SearchVod, VodThumbnails } from "@/elements";
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ videoId: "from tRPC" });
-
   return (
     <>
       <Head>
