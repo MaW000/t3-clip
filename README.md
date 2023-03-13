@@ -1,3 +1,10 @@
+# Info
+
+This is my first Typescript/T3 stack deployed project
+It is a new and improved pogInChat, a web app that condeses VODS
+Save your favorite streamers vods for users to vote on the best moments
+Paste in ids/urls from recent broadcasts [Twitch Channel](https://www.twitch.tv/twitchplayspokemon/videos)
+
 # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
