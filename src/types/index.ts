@@ -11,7 +11,12 @@ export interface TwitchVideoCommentResponse {
     };
   };
 }
-
+export interface Message {
+  message: string;
+  commenter: string;
+  contentOffsetSeconds: number;
+  vidId: string;
+}
 export interface UniqueCommentsResult {
   comments: {
     message: string;
