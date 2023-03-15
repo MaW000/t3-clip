@@ -18,7 +18,7 @@ export const HeaderSearch = () => {
     <div className={`col-span-9 col-start-1 row-span-full  ml-5`}>
       <Link
         href="/"
-        className="relative inline-block w-[15%] rounded-l-lg bg-slate-600 py-2  text-center  text-xl font-semibold text-purple-400 transition duration-300 hover:bg-purple-600 hover:text-white hover:shadow-lg"
+        className="relative inline-block w-[15%] rounded-l-lg bg-[black] py-2  text-center  text-xl font-semibold text-purple-400 transition duration-300 hover:bg-purple-600 hover:text-white hover:shadow-lg"
       >
         NextClip
         <div className="absolute bottom-2  left-1/2 flex h-1 w-1/2 -translate-x-1/2  items-center justify-center bg-purple-400" />

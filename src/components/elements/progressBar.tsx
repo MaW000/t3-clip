@@ -16,11 +16,6 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
       console.log("close");
       setConnectionClosed(bool);
     });
-
-    return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
-    };
   }, [videoId, num]);
   return (
     <>

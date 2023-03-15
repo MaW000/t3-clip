@@ -16,7 +16,7 @@ export const VideoDash = ({
 
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
- 
+
     const w = playerRef.current.clientWidth;
     const h = (9 / 16) * w;
     const options = {

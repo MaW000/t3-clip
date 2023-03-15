@@ -39,30 +39,101 @@ model Account {
     @@unique([provider, providerAccountId])
 }
 
+model Channel {
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    streamer String    @unique
+    avatar   String?
+    seId     String?
+    videoIds String[]  @db.ObjectId
+    videos   Video[]
+    terms    Term[]
+    hashtags Hashtag[]
+}
+
+model Emote {
+    id      String @id @default(auto()) @map("_id") @db.ObjectId
+    emojiId String
+    name    String
+    type    String
+    url1    String
+    url2    String
+    url3    String
+}
+
 model Video {
-    id          String  @id @default(auto()) @map("_id") @db.ObjectId
-    videoId     Int     @unique @db.Int
-    url         String?
-    description String?
-    duration    String?
-    title       String?
-    lengthSec   Int?
-    thumbnail   String?
-    userName    String?
-    views       Int?
-    language    String?
-    date        String?
-    comments    Msg[]
-    complete    Boolean @default(false)
+    id           String        @id @default(auto()) @map("_id") @db.ObjectId
+    channelId    String        @db.ObjectId
+    videoId      Int           @unique @db.Int
+    url          String
+    description  String
+    duration     String
+    title        String
+    thumbnail    String
+    streamer     String
+    views        Int
+    language     String
+    date         String
+    createdAt    String
+    comments     Msg[]
+    Cards        Card[]
+    commentCards CommentCard[]
+    complete     Boolean       @default(false)
+    Channel      Channel       @relation(fields: [channelId], references: [id])
+}
+
+model Hashtag {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    channelId String @db.ObjectId
+
+    hashtag String
+    amount  Int
+
+    Channel Channel @relation(fields: [channelId], references: [id])
+}
+
+model Term {
+    id        String  @id @default(auto()) @map("_id") @db.ObjectId
+    channelId String  @db.ObjectId
+    emojiId   String
+    term      String
+    amount    Int
+    type      String
+    Channel   Channel @relation(fields: [channelId], references: [id])
+}
+
+model Card {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    vidId       String        @db.ObjectId
+    keyword     String
+    interval    Int
+    average     Int?
+    CommentCard CommentCard[]
+    Video       Video         @relation(fields: [vidId], references: [id])
+}
+
+model CommentCard {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    timestamp            String
+    contentOffsetSeconds Int
+    count                Int
+    cardId               String   @db.ObjectId
+    vidId                String   @db.ObjectId
+    msgIds               String[] @db.ObjectId
+    card                 Card     @relation(fields: [cardId], references: [id])
+    video                Video    @relation(fields: [vidId], references: [id])
+    messages             Msg[]    @relation(fields: [msgIds], references: [id])
 }
 
 model Msg {
-    id                   String  @id @default(auto()) @map("_id") @db.ObjectId
-    vidId                String  @db.ObjectId
+    id                   String        @id @default(auto()) @map("_id") @db.ObjectId
+    vidId                String        @db.ObjectId
+    cardIds              String[]      @db.ObjectId
     message              String
+    commentId            String        @unique
     commenter            String?
     contentOffsetSeconds Int
-    Video                Video   @relation(fields: [vidId], references: [id])
+    Video                Video         @relation(fields: [vidId], references: [id])
+    commentCards         CommentCard[] @relation(fields: [cardIds], references: [id])
 }
 
 model Session {

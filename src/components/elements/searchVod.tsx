@@ -7,7 +7,7 @@ export const SearchVod = ({ ...props }) => {
   const router = useRouter();
   function handleUrl() {
     const matches = url.match(/\d+/g);
-   
+
     if (matches === null) {
       setError("Please enter a valid VideoID");
     } else {
@@ -20,7 +20,7 @@ export const SearchVod = ({ ...props }) => {
   return (
     <div
       className={
-        "mt-10 ml-5  flex flex-col justify-center md:ml-7 lg:ml-0 lg:flex-row lg:space-x-5"
+        " mt-3 ml-5  flex flex-col justify-center md:ml-7 lg:ml-0 lg:flex-row lg:space-x-5"
       }
       {...props}
     >

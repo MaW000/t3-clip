@@ -5,7 +5,7 @@ import { api } from "~/utils/api";
 import {
   TitleDescription,
   SearchVod,
- 
+  VodThumbnails,
   HeaderMain,
 } from "@/elements";
 
@@ -18,11 +18,22 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="min-h-screen">
-        <HeaderMain toggleSearch={true} />
-        <TitleDescription />
-
-        <SearchVod />
+      <main className="max-h-screen min-h-screen">
+        <HeaderMain toggleSearch={false} />
+        <div className="">
+          <TitleDescription />
+          <div className="mt-12 flex">
+            <VodThumbnails />
+          </div>
+          <p className="text-md mt-10 px-5 text-center font-medium text-white md:text-lg lg:text-2xl">
+            Paste in a <span className="text-purple-400">Twitch VOD</span> and
+            find the most{" "}
+            <span className="font-bold uppercase text-red-500">
+              hype moments!!!
+            </span>
+          </p>
+          <SearchVod />
+        </div>
       </main>
     </>
   );
