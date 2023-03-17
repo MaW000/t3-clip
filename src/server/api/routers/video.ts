@@ -4,54 +4,125 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+import type {
+  VideoResponse, TwitchVideo, TwitchVideoResponse, Channel, EmojiData,
+  HashtagData,
+  EmoteData, TermDataInput, EmoteCreateManyInput, EmoteGroup, Emote, StreamerProfile, Emotes
+} from "~/types/video";
 import { pusher } from "~/utils/pusher";
 
 export const videoRouter = createTRPCRouter({
   getVideo: publicProcedure
     .input(z.object({ videoId: z.number() }))
-    .mutation(async ({ input, ctx }) => {
+    .query(async ({ input, ctx }) => {
 
       const toggle = await ctx.prisma.video.findFirst({
         where: { videoId: input.videoId },
-        select: { complete: true },
+        select: { complete: true, streamer: true },
       });
       //if video does not exist we start fetching data but instantly return video is fetching to update ui.
       if (!toggle) {
-        console.log('a')
+
+
         VideoDataFetch();
 
-        return { fetch: `Video has started fetching comments` };
+        return true
       } else if (!toggle.complete) {
-        return { fetch: `video is saving` };
+        return false
       } else {
-        return { saved: `video is saved` };
+        return false
+      }
+
+      async function fetchEmoteUrls(username: string) {
+        async function getStreamEleUserData(username: string) {
+          const userData = await fetch(
+            `https://api.streamelements.com/kappa/v2/channels/${username}`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${process.env.JWT_TOKEN_STREAM || ""}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((response) => response.json())
+            .then((data: StreamerProfile) => {
+              return data;
+            })
+            .catch((error) => console.error(error));
+          if (!userData) return
+          const info = userData
+          console.log('chanell info avatar set')
+          await ctx.prisma.channel.update({
+            where: { streamer: info.displayName },
+            data: { avatar: info.avatar, seId: info._id, }
+          })
+          return info
+        }
+
+        async function getStreamEleEmotes(userId: string) {
+          function isEmote(value: Emote | null): value is Emote {
+            return value !== null;
+          }
+
+          const termData = await fetch(
+            `https://api.streamelements.com/kappa/v2/channels/${userId}/emotes`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${process.env.JWT_TOKEN_STREAM || ""}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((response) => response.json())
+            .then((data: Emotes) => {
+              const dataValues = Object.values(data);
+              const dataFlat: EmoteGroup[] = dataValues.flat() as EmoteGroup[];
+              const dataf: (Emote | null)[] = dataFlat.flatMap(emoteGroup => Object.values(emoteGroup || {}));
+              const filtered = dataf.filter(isEmote);
+              return filtered
+            })
+            .catch((error) => console.error(error));
+          if (!termData) return
+          const emoteData = termData.map(info => {
+            return {
+              emojiId: info._id,
+              name: info.name,
+              gif: info.gif,
+              type: info.type,
+              url1: info.urls["1"],
+              url2: info.urls["2"],
+              url3: info.urls["4"],
+            }
+          })
+          const existingEmotes = await ctx.prisma.emote.findMany({
+            select: {
+              emojiId: true,
+            },
+          });
+          const existingEmojiIds = new Set(existingEmotes.map(emote => emote.emojiId));
+          const uniqueEmoteData = emoteData.filter(emote => !existingEmojiIds.has(emote.emojiId));
+          if (uniqueEmoteData.length > 0) {
+
+            const a = await ctx.prisma.emote.createMany({ data: uniqueEmoteData as EmoteCreateManyInput[] })
+            console.log('new Emotes created', a)
+          } else {
+            const { log } = console
+            log('no new Emotes from this user')
+          }
+        }
+
+        const info = await getStreamEleUserData(username)
+        if (!info) return
+        await getStreamEleEmotes(info._id)
       }
 
       function VideoDataFetch() {
-        interface TwitchVideo {
-          id: string;
-          user_id: string;
-          stream_id: string;
-          user_name: string;
-          title: string;
-          description: string;
-          created_at: string;
-          published_at: string;
-          url: string;
-          thumbnail_url: string;
-          viewable: string;
-          view_count: number;
-          language: string;
-          type: string;
-          duration: string;
-          muted_segments: null;
-        }
-        interface TwitchVideoResponse {
-          data: TwitchVideo[];
-          pagination: {
-            cursor: string;
-          };
-        }
+
+
 
         function convertToSeconds(str: string) {
           if (str.length > 6) {
@@ -71,13 +142,10 @@ export const videoRouter = createTRPCRouter({
             return seconds;
           }
         }
-        console.log('dog')
+        //processVideo 
         async function processVideo(vidInfo: TwitchVideo) {
           const channelAndVideoSave = async () => {
-            interface Channel {
-              id: string;
-              streamer: string;
-            }
+
             let channel: Channel | null = null;
 
             channel = await ctx.prisma.channel.findUnique({
@@ -85,6 +153,7 @@ export const videoRouter = createTRPCRouter({
             });
 
             if (!channel) {
+              console.log('new channel created')
               const newStreamer = await ctx.prisma.channel.create({
                 data: { streamer: vidInfo.user_name },
               });
@@ -105,16 +174,18 @@ export const videoRouter = createTRPCRouter({
               url: vidInfo.url,
               createdAt: vidInfo.created_at,
             };
+            console.log('newvideo created')
             const video = await ctx.prisma.video.create({ data: data });
-
-            const updatedChannel = await ctx.prisma.channel.update({
-              where: { id: channel.id },
-              data: { videoIds: { push: video.id } },
-            });
-            console.log(updatedChannel)
+            if (channel) {
+              console.log('video updated to channel')
+              await ctx.prisma.channel.update({
+                where: { id: channel.id },
+                data: { videoIds: { push: video.id } },
+              });
+            }
             return video;
           };
-
+          //this creates a new channel and fetches their top emotes and hashtags otherwise returns chanell id
           const videoObj = await channelAndVideoSave();
           const vidLengthS = convertToSeconds(vidInfo.duration);
           const midSecond = Math.floor(vidLengthS / 2);
@@ -143,26 +214,8 @@ export const videoRouter = createTRPCRouter({
 
 
       async function getChannelTerms(username: string, channelObjectId: string) {
-        interface EmojiData {
-          channel: string;
-          totalMessages: number;
-          chatters: [];
-          hashtags: [];
-          commands: [];
-          bttvEmotes: [];
-          ffzEmotes: [];
-          twitchEmotes: [];
-        }
-        interface HashtagData {
-          hashtag: string;
-          amount: number;
-        }
-        interface EmoteData {
-          id: string;
-          emote: string;
-          amount: number;
-        }
-        console.log(username)
+
+        await fetchEmoteUrls(username)
         const termData = await fetch(
           `https://api.streamelements.com/kappa/v2/chatstats/${username}/stats?limit=10`,
           {
@@ -179,21 +232,7 @@ export const videoRouter = createTRPCRouter({
             return data;
           })
           .catch((error) => console.error(error));
-        console.log(termData)
         if (!termData) return { error: `Invalid Request` };
-        const emote: EmoteData[] = termData.bttvEmotes.concat(
-          termData.ffzEmotes,
-          termData.twitchEmotes
-        );
-        const bttvEmotes = termData.bttvEmotes.map((emote: EmoteData) => {
-          return {
-            term: emote.emote,
-            channelId: channelObjectId,
-            amount: emote.amount,
-            emojiId: emote.id,
-            type: 'bttvEmotes'
-          }
-        });
         const hashtags = termData.hashtags
           .filter((hashtag: HashtagData) => hashtag.hashtag.length > 0)
           .map((hashtag: HashtagData) => ({
@@ -201,21 +240,25 @@ export const videoRouter = createTRPCRouter({
             channelId: channelObjectId,
             amount: hashtag.amount,
           }));
-        const terms = emote
-          .filter((term: EmoteData) => term.emote.length > 0)
-          .map((term: EmoteData) => {
-            console.log(term)
-            return {
-              term: term.emote,
-              channelId: channelObjectId,
-              amount: term.amount,
-              emojiId: term.id,
-            }
-          });
 
+
+        function mapEmotes(emotes: EmoteData[], type: string): TermDataInput[] {
+          return emotes.map((emote: EmoteData) => ({
+            term: emote.emote,
+            channelId: channelObjectId,
+            amount: emote.amount,
+            emojiId: emote.id,
+            type,
+          }));
+        }
+        const b = mapEmotes(termData.ffzEmotes, "ffz");
+        const c = mapEmotes(termData.twitchEmotes, "twitch");
+        const a = mapEmotes(termData.bttvEmotes, "bttv");
+        const d = b.concat(c, a);
+        console.log('new terms/hashtags created')
         await ctx.prisma.hashtag.createMany({ data: hashtags });
         await ctx.prisma.term.createMany({
-          data: terms,
+          data: d,
         })
 
         const termIds = await ctx.prisma.term.findMany({ where: { channelId: channelObjectId }, select: { id: true } })
@@ -224,7 +267,7 @@ export const videoRouter = createTRPCRouter({
         const hashtagIds = await ctx.prisma.hashtag.findMany({ where: { channelId: channelObjectId }, select: { id: true } })
         const hashtagIdArray = hashtagIds.map((hashtag) => ({ id: hashtag.id }));
 
-
+        console.log('terms/hashtags updated to channel')
         await ctx.prisma.channel.update({
           where: {
             id: channelObjectId
@@ -238,8 +281,9 @@ export const videoRouter = createTRPCRouter({
             }
           }
         });
-
       }
+
+
       async function getComments(
         firstSecond: number,
         vidLength: number,
@@ -269,71 +313,8 @@ export const videoRouter = createTRPCRouter({
         }
 
         async function fetchComments(direction: string) {
-          interface VideoResponse {
-            data: {
-              video: {
-                id: string;
-                creator: {
-                  id: string;
-                  channel: {
-                    id: string;
-                    __typename: string;
-                  };
-                  __typename: string;
-                };
-                comments: {
-                  edges: {
-                    cursor: string;
-                    node: {
-                      id: string;
-                      commenter: {
-                        id: string;
-                        login: string;
-                        displayName: string;
-                        __typename: string;
-                      };
-                      contentOffsetSeconds: number;
-                      createdAt: string;
-                      message: {
-                        fragments: [
-                          {
-                            emote: string;
-                            text: string;
-                            __typename: string;
-                          }
-                        ];
-                        userBadges: [
-                          {
-                            id: string;
-                            setID: string;
-                            version: string;
-                            __typename: string;
-                          }
-                        ];
-                        userColor: string;
-                        __typename: string;
-                      };
-                      __typename: string;
-                    };
-                    __typename: string;
-                  }[];
-                  pageInfo: {
-                    hasNextPage: boolean;
-                    hasPreviousPage: boolean;
-                    __typename: string;
-                  };
-                  __typename: string;
-                };
-                __typename: string;
-              };
-            };
-            extensions: {
-              durationMilliseconds: number;
-              operationName: string;
-              requestID: string;
-            };
-          }
-
+          //going forward use cursor going backwards use seconds          
+          //generates the variables for fetch
           function generateQuery() {
             const queryVariablesStart = firstCommentCursor
               ? {
@@ -451,17 +432,17 @@ export const videoRouter = createTRPCRouter({
           }
         }
         while (firstSecond < midBackwardSec || midForwardSec < endSecond) {
+          //send a push every 5% && calculates percentage completed
           const sumHead = midSecond - midBackwardSec + firstSecond;
           const sumTail = vidLength - endSecond + midForwardSec;
           const percent = calculatePercentage(sumHead, sumTail);
-          //send a push every 5%
           console.log(percent)
           if (percent >= p + 1) {
             console.log(percent)
             await pusher.trigger(`${input.videoId}`, "update", percent);
             p = percent;
           }
-
+          //loop thhat fetches comments using 4 pormise all at begining middle and end convering
           async function promiseAllFetches() {
             if (firstSecond < midBackwardSec && midForwardSec < endSecond) {
               const [
@@ -507,22 +488,19 @@ export const videoRouter = createTRPCRouter({
             }
           }
           if (comments.length > 2000) {
-            await saveFilter(vidObjId);
+            await saveFilter();
           }
           await promiseAllFetches();
         }
-
-        async function saveFilter(vidObjId: string) {
+        //saves comments to db and pushes id to global set for filtering
+        async function saveFilter() {
           const uniqueComments: Message[] = [];
-
           comments.forEach((comment) => {
             if (!seenCommentIds.has(comment.commentId)) {
               uniqueComments.push(comment);
               seenCommentIds.add(comment.commentId);
             }
           });
-
-
           await ctx.prisma.msg.createMany({
             data: uniqueComments,
           });
@@ -531,29 +509,30 @@ export const videoRouter = createTRPCRouter({
 
         await pusher.trigger(`${input.videoId}`, "closeVod", true);
         if (comments.length > 0) {
-          await saveFilter(vidObjId);
+          await saveFilter();
         }
+
         await ctx.prisma.video.update({
           where: { videoId: input.videoId },
           data: { complete: true },
         })
         console.log('saving complete')
       }
-
     }),
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.video.findMany({
-      select: {
-        title: true,
-        streamer: true,
-        views: true,
-        thumbnail: true,
-        language: true,
-        videoId: true,
-        date: true,
-      },
-    });
-  }),
+  getAll: publicProcedure
+    .query(async ({ ctx }) => {
+      return ctx.prisma.video.findMany({
+        select: {
+          title: true,
+          streamer: true,
+          views: true,
+          thumbnail: true,
+          language: true,
+          videoId: true,
+          date: true,
+        },
+      });
+    }),
 
   deleteAll: publicProcedure
     .input(z.object({ videoId: z.number() }))
@@ -567,6 +546,7 @@ export const videoRouter = createTRPCRouter({
       const vidId = video?.id;
 
       if (vidId) {
+
         await ctx.prisma.msg.deleteMany({
           where: { vidId: vidId },
         });
@@ -574,7 +554,9 @@ export const videoRouter = createTRPCRouter({
         await ctx.prisma.card.deleteMany({ where: { vidId: video.id } });
         await ctx.prisma.term.deleteMany({ where: { channelId: video.channelId } })
         await ctx.prisma.hashtag.deleteMany({ where: { channelId: video.channelId } })
+        await ctx.prisma.emote.deleteMany({
 
+        });
         await ctx.prisma.video.deleteMany({
           where: { id: vidId },
         });
