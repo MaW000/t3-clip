@@ -1,30 +1,37 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "~/utils/api";
 export const VodThumbnails = ({}) => {
   const [videos, setVideos] = useState([]);
   const router = useRouter();
-  //   useEffect(() => {
-  //     const endpoint = `/api/video/data`;
-  //     fetch(endpoint, {
-  //       method: "GET",
-  //      headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     })
-  //       .then(async (res) => await res.json())
-  //       .then((res) => {
-  //         setVideos(res.data);
-  //       });
-  //   }, []);
+  const videoArr = api.video.getAll.useQuery().data;
+  console.log(videoArr);
   return (
     <div
-      className={`mx-auto mt-10 flex gap-4 rounded-lg bg-slate-500 p-2 ${
+      className={`mx-auto mt-10 flex gap-4 rounded-lg bg-slate-500 p-2  ${
         videos ? "" : "hidden"
       }`}
     >
-      {/* {videos.length >= 1 &&
-        videos.map((video, i) => {
+      {videoArr &&
+        videoArr.length >= 1 &&
+        videoArr.map((video, i) => {
+          let thumbnail: string;
+          if (video.thumbnail.includes("vod-secure")) {
+            thumbnail = video.thumbnail
+              .replace(/%{width}/, "320")
+              .replace(/%{height}/, "180");
+          } else {
+            thumbnail = video.thumbnail
+              .replace(/%{width}/, "480")
+              .replace(/%{height}/, "270");
+          }
+          const date = new Date(video.date);
+          const formattedDate = date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
           return (
             <div
               key={i}
@@ -35,7 +42,7 @@ export const VodThumbnails = ({}) => {
             >
               <div className={"relative"}>
                 <Image
-                  src={video.thumbnail}
+                  src={thumbnail}
                   height="270"
                   width={"480"}
                   alt="thumbnail"
@@ -48,7 +55,7 @@ export const VodThumbnails = ({}) => {
                 </h1>
                 {video.date && (
                   <h1 className="absolute top-0 left-0 rounded-br-md bg-teal-900 px-2 text-xs font-semibold text-zinc-300">
-                    {video.date}
+                    {formattedDate}
                   </h1>
                 )}
               </div>
@@ -57,7 +64,7 @@ export const VodThumbnails = ({}) => {
               </h1>
             </div>
           );
-        })} */}
+        })}
     </div>
   );
 };

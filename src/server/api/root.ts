@@ -1,13 +1,16 @@
 import { createTRPCRouter } from "~/server/api/trpc";
-import { exampleRouter } from "~/server/api/routers/example";
+import { videoRouter } from "~/server/api/routers/video";
+import { commentRouter } from "~/server/api/routers/comment";
+import { emoteRouter } from "~/server/api/routers/emote";
 /**
  * This is the primary router for your server.
  *
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  example: exampleRouter,
-
+  video: videoRouter,
+  comment: commentRouter,
+  emote: emoteRouter,
 });
 
 // export type definition of API

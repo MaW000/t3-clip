@@ -20,5 +20,25 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'vod-secure.twitch.tv',
+        port: '',
+        pathname: '/**',
+      }, {
+        protocol: 'https',
+        hostname: 'static-cdn.jtvnw.net',
+        port: '',
+        pathname: '/**',
+      }, {
+        protocol: 'https',
+        hostname: 'cdn.frankerfacez.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 export default config;
