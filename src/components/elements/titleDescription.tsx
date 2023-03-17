@@ -1,6 +1,6 @@
 import React from "react";
 
-export const TitleDescription = () => {
+export const TitleDescription  = () => {
   return (
     <div className=" flex select-none flex-col items-center  ">
       <h1

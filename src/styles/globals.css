@@ -5,3 +5,33 @@
 body {
   @apply bg-gradient-to-b from-[#242424] to-[#15162c];
 }
+@layer utilities {
+  .scrollbar-x::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+  }
+
+  .scrollbar-x::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #18181b;
+  }
+
+  .scrollbar-x::-webkit-scrollbar-thumb {
+    background: #68686a;
+    border-radius: 100vh;
+    border: 3px solid #68686a;
+  }
+
+  .scrollbar-x::-webkit-scrollbar-thumb:hover {
+    background: #18181b;
+  }
+}
+
+@layer components {
+  .labelCards {
+    @apply absolute bottom-7 right-1 -translate-x-1/2 transform font-mono  text-periwinkle-gray-500;
+  }
+  .labelCardsH {
+    @apply absolute -bottom-8 left-1/2 -translate-x-1/2 transform font-mono text-xl  text-periwinkle-gray-500;
+  }
+}

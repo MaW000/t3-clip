@@ -37,6 +37,11 @@ const config = {
         hostname: 'cdn.frankerfacez.com',
         port: '',
         pathname: '/**',
+      }, {
+        protocol: 'https',
+        hostname: 'cdn.betterttv.net',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

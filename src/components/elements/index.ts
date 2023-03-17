@@ -1,4 +1,3 @@
-export { TitleDescription } from "./titleDescription"
 export { SearchVod } from './searchVod'
 export { VodThumbnails } from './vodThumbnails'
 export { ProgressBar } from './progressBar'
@@ -8,3 +7,7 @@ export { VideoLoader } from './videoLoader'
 export { HeaderMain } from './headerMain'
 export { HeaderSearch } from './headerSearch'
 export { TwitchEmbed } from './twitchEmbed'
+export { EmoteCarousel } from './emoteCarousel'
+export { EmoteCards } from './emoteCards'
+export { TitleDescription } from './titleDescription'
+export { CommentCards } from './commentCards'

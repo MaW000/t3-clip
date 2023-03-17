@@ -439,7 +439,11 @@ export const videoRouter = createTRPCRouter({
           console.log(percent)
           if (percent >= p + 1) {
             console.log(percent)
-            await pusher.trigger(`${input.videoId}`, "update", percent);
+            try {
+              await pusher.trigger(`${input.videoId}`, "update", percent);
+            } catch (err) {
+              console.log(err)
+            }
             p = percent;
           }
           //loop thhat fetches comments using 4 pormise all at begining middle and end convering
@@ -541,7 +545,22 @@ export const videoRouter = createTRPCRouter({
         where: { videoId: input.videoId },
         select: { id: true, channelId: true },
       });
+      await ctx.prisma.msg.deleteMany({
 
+      });
+      await ctx.prisma.commentCard.deleteMany({});
+      await ctx.prisma.card.deleteMany({});
+      await ctx.prisma.term.deleteMany({})
+      await ctx.prisma.hashtag.deleteMany({})
+      await ctx.prisma.emote.deleteMany({
+
+      });
+      await ctx.prisma.video.deleteMany({
+
+      });
+      await ctx.prisma.channel.deleteMany({
+
+      });
 
       const vidId = video?.id;
 
