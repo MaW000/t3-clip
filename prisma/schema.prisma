@@ -51,13 +51,15 @@ model Channel {
 }
 
 model Emote {
-    id      String @id @default(auto()) @map("_id") @db.ObjectId
-    emojiId String
+    id      String  @id @default(auto()) @map("_id") @db.ObjectId
+    emojiId String  @unique
     name    String
+    gif     Boolean
     type    String
-    url1    String
-    url2    String
-    url3    String
+    url1    String?
+    url2    String?
+    url3    String?
+    terms   Term[]
 }
 
 model Video {
@@ -94,11 +96,12 @@ model Hashtag {
 model Term {
     id        String  @id @default(auto()) @map("_id") @db.ObjectId
     channelId String  @db.ObjectId
-    emojiId   String
+    emojiId   String  @unique
     term      String
     amount    Int
     type      String
     Channel   Channel @relation(fields: [channelId], references: [id])
+    Emote     Emote?  @relation(fields: [emojiId], references: [emojiId])
 }
 
 model Card {

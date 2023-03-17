@@ -1,8 +1,8 @@
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { ProgressBar, VideoDash, HeaderMain } from "~/components/elements";
-import { api } from "~/utils/api";
-import { useEffect, useState, useRef } from "react";
+import { VideoDash, HeaderMain } from "~/components/elements";
+
+import { useState } from "react";
 import Script from "next/script";
 import Head from "next/head";
 const VideoPage: NextPage = () => {
@@ -15,7 +15,6 @@ const VideoPage: NextPage = () => {
   if (videoId === "" || typeof videoId !== "number") {
     return <div>Invalid video ID</div>;
   }
-
 
   return (
     <>
@@ -31,7 +30,7 @@ const VideoPage: NextPage = () => {
       />
       <main className="min-h-screen ">
         <HeaderMain toggleSearch={true} />
-        {toggle && <VideoDash videoId={videoId} toggle={toggle} />}
+        {toggle && <VideoDash videoId={videoId} />}
       </main>
     </>
   );

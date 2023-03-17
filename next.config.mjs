@@ -32,6 +32,11 @@ const config = {
         hostname: 'static-cdn.jtvnw.net',
         port: '',
         pathname: '/**',
+      }, {
+        protocol: 'https',
+        hostname: 'cdn.frankerfacez.com',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

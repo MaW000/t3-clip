@@ -21,6 +21,12 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
     <>
       {!connectionClosed && (
         <div className="mt-10 flex w-64 select-none flex-col items-center space-y-5 border-2 border-blue-500 pt-20">
+          <div>
+            <h1 className="mx-10 my-5 text-xl font-semibold text-slate-900">
+              Fetching comments this will take a while refresh in a few
+              minutes...
+            </h1>
+          </div>
           <h1>{num}</h1>
           <div style={{ width: `${num}%` }} className={`z-10 h-5  bg-black`} />
         </div>
