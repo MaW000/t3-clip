@@ -1,20 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect,  } from "react";
 import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
 
 export const TwitchEmbed = ({
   videoId,
   setPlayer,
   player,
+  playerRef,
 }: {
   videoId: number;
   setPlayer: SetPlayerFn;
   player: TwitchPlayer | null;
 }) => {
-  const playerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
 
-    const w = playerRef.current.clientWidth;
+    const w = playerRef.current.clientWidth - 50;
     const h = (9 / 16) * w;
     const options = {
       width: w,

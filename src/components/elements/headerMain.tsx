@@ -38,7 +38,7 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
           <div className="absolute bottom-1  left-1/2 flex h-1 w-1/2 -translate-x-1/2  items-center justify-center bg-purple-400" />
         </Link>
         <input
-          className="h-12 w-[75%] py-2 indent-2 align-top text-xl leading-none"
+          className="h-12 w-[72%] py-2 indent-2 align-top text-xl leading-none"
           placeholder="Vod url / Id"
           onChange={(e) => setUrl(e.target.value)}
         />

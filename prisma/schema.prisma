@@ -79,8 +79,9 @@ model Video {
     comments     Msg[]
     Cards        Card[]
     commentCards CommentCard[]
-    complete     Boolean       @default(false)
-    Channel      Channel       @relation(fields: [channelId], references: [id])
+
+    complete Boolean @default(false)
+    Channel  Channel @relation(fields: [channelId], references: [id])
 }
 
 model Hashtag {
@@ -94,14 +95,15 @@ model Hashtag {
 }
 
 model Term {
-    id        String  @id @default(auto()) @map("_id") @db.ObjectId
-    channelId String  @db.ObjectId
-    emojiId   String  @unique
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    channelId String @db.ObjectId
+    emojiId   String @unique
     term      String
     amount    Int
     type      String
-    Channel   Channel @relation(fields: [channelId], references: [id])
-    Emote     Emote?  @relation(fields: [emojiId], references: [emojiId])
+
+    Channel Channel @relation(fields: [channelId], references: [id])
+    Emote   Emote?  @relation(fields: [emojiId], references: [emojiId])
 }
 
 model Card {
@@ -109,7 +111,11 @@ model Card {
     vidId       String        @db.ObjectId
     keyword     String
     interval    Int
-    average     Int?
+    sum         Int?
+    avg         Int?
+    max         Int?
+    min         Int?
+    url        String?
     CommentCard CommentCard[]
     Video       Video         @relation(fields: [vidId], references: [id])
 }

@@ -37,22 +37,54 @@ export const emoteRouter = createTRPCRouter({
         .input(
             z.object({
                 videoId: z.number(),
-                keyword: z.string(),
-                interval: z.number(),
             })
         )
-        .mutation(async ({ ctx, input }) => {
+        .query(async ({ ctx, input }) => {
+            const channel = await ctx.prisma.video.findUnique({
+                where: {
+                    videoId: input.videoId,
+                }
+            })
+            if (!channel) return
+
             const topTerms = await ctx.prisma.term.findMany({
                 where: {
-                    channelId: "64132b9b5a76a82ca3c2bf60"
+                    channelId: channel.channelId
                 },
                 orderBy: {
                     amount: 'desc'
                 },
-                take: 10
+                take: 50,
             })
-            return {
-                greeting: "hello",
-            };
+            const topTermsWithEmotes = await Promise.all(
+                topTerms.map(async (term) => {
+                    const termWithEmote = await ctx.prisma.term.findUnique({
+                        where: {
+                            emojiId: term.emojiId,
+                        },
+                        include: {
+                            Emote: true,
+                        },
+                    });
+                    return termWithEmote;
+                })
+            );
+            const terms = topTermsWithEmotes;
+            const filteredData = terms?.filter((term) => term?.Emote);
+            const mappedData = filteredData
+                ?.map((term) => {
+                    if (term === null) return null;
+                    if (term?.Emote === null) return null;
+                    if (!term.Emote.url1 || !term.Emote.url2 || !term.Emote.url3) return null
+                    return {
+                        term: term.term,
+                        amount: term.amount,
+                        url: term.Emote.url1 || term.Emote.url2 || term.Emote.url3,
+                        emojiId: term.Emote.emojiId,
+                    };
+                }).filter((term) => term !== null);
+
+
+            return mappedData;
         }),
 });

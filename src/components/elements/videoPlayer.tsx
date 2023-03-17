@@ -1,5 +1,5 @@
-import React, {  useState,  } from "react";
-import {  VodParse, TwitchEmbed } from "@/elements";
+import React, { useState, useRef } from "react";
+import { VodParse, TwitchEmbed, EmoteCarousel } from "@/elements";
 import { api } from "~/utils/api";
 interface TwitchPlayer {
   play: () => void;
@@ -9,21 +9,31 @@ interface TwitchPlayer {
 }
 export const VideoDash = ({ videoId }: { videoId: number }) => {
   const [player, setPlayer] = useState<TwitchPlayer | null>(null);
-
+  const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
 
   return (
-    <div>
-      <div className="mx-5 md:grid md:grid-cols-12">
-        <TwitchEmbed player={player} setPlayer={setPlayer} videoId={videoId} />
+    <div className="relative">
+      <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
+        <TwitchEmbed
+          player={player}
+          playerRef={playerRef}
+          setPlayer={setPlayer}
+          videoId={videoId}
+        />
 
         {player && (
-          <VodParse player={player} videoId={videoId} completed={response} />
+          <VodParse
+            player={player}
+            playerRef={playerRef}
+            videoId={videoId}
+            completed={response}
+          />
         )}
       </div>
       <div>
-        <h1>asdfasdfom</h1>
+        <EmoteCarousel videoId={videoId} />
       </div>
     </div>
   );
