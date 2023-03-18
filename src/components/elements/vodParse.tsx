@@ -13,6 +13,7 @@ export const VodParse = ({
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
     onSuccess: () => console.log("success"),
   });

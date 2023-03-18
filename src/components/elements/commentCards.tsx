@@ -20,6 +20,7 @@ export const CommentCards = ({
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   // const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   // console.log(videoSaveRes);
   const a = api.card.getCards.useQuery({ videoId: videoId });
