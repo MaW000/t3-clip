@@ -13,7 +13,14 @@ interface Card {
 }
 import type { Term } from "~/types/emote";
 import Image from "next/image";
-export const CommentCards = ({ videoId, playerRef }: { videoId: number }) => {
+export const CommentCards = ({
+  videoId,
+  playerRef,
+}: {
+  videoId: number;
+  playerRef: React.RefObject<HTMLDivElement>;
+}) => {
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   // const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   // console.log(videoSaveRes);
   const a = api.card.getCards.useQuery({ videoId: videoId });
@@ -22,7 +29,7 @@ export const CommentCards = ({ videoId, playerRef }: { videoId: number }) => {
   const x = playerRef.current.clientHeight - 200;
   console.log(x);
   return (
-    <div className="mr-2 mt-2 flex flex-col gap-2 ">
+    <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
         if (!card.url) return;
         console.log(card);
