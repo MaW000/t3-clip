@@ -11,6 +11,7 @@ export const VodParse = ({
   player: object;
   videoId: number;
   completed: boolean | undefined;
+  playerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const getComments = api.comment.getComments.useMutation({
     onSuccess: () => console.log("success"),
