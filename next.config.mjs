@@ -45,5 +45,18 @@ const config = {
       },
     ],
   },
+  headers: async () => {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; img-src 'self' data: vod-secure.twitch.tv static-cdn.jtvnw.net cdn.frankerfacez.com cdn.betterttv.net vitals.vercel-insights.com",
+          },
+        ],
+      },
+    ];
+  },
 };
 export default config;
