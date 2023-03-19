@@ -34,7 +34,7 @@ interface Emotes {
 
 export const commentRouter = createTRPCRouter({
     getComments: publicProcedure
-        .input(z.object({ videoId: z.number(), keyword: z.string(), interval: z.number().default(5), }))
+        .input(z.object({ videoId: z.number(), keyword: z.string(), interval: z.number().default(30), }))
         .mutation(async ({ ctx, input }) => {
             if (!input.videoId) return;
 
