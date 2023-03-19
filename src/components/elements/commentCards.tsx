@@ -93,7 +93,7 @@ export const CommentCards = ({
   }, [queryData]);
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   console.log(queryData);
-  const handleClearMessages = (card, timestamp) => {
+  const handleClearMessages = (card: Card, timestamp: Timestamp) => {
     const updatedCardsf =
       cards.map((cardx) => {
         if (cardx.id === card.id) {
