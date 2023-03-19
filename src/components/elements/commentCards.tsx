@@ -10,7 +10,7 @@ interface Card {
   max: number | null;
   min: number | null;
   url: string | null;
-  timestamps?: Timestamp[];
+  timestamps?: Timestamp[] | null;
 }
 interface Timestamp {
   id: string;
@@ -30,7 +30,8 @@ export const CommentCards = ({
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const [cards, setCards] = useState<Card[] | null>(null);
+  const [cards, setCards] = useState<Card[]>([]);
+
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
@@ -40,7 +41,7 @@ export const CommentCards = ({
           if (card.id === data[0].cardId) {
             // create a new card object with updated timestamps
             const updatedCard = { ...card };
-            updatedCard.timestamps = data || [];
+            updatedCard.timestamps = data;
             console.log;
             return updatedCard;
           } else {
@@ -60,6 +61,7 @@ export const CommentCards = ({
   if (!cards) setCards(queryData);
   const x = playerRef.current.clientHeight - 200;
   console.log(x);
+  if (!cards) return;
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
@@ -132,7 +134,7 @@ export const CommentCards = ({
                   setCards((cards) =>
                     cards.map((c) => {
                       if (c.id === card.id) {
-                        return { ...c, timestamps: null };
+                        return { ...c, timestamps: null } as Card;
                       } else {
                         return c;
                       }
