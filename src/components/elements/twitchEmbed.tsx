@@ -36,9 +36,7 @@ export const TwitchEmbed = ({
     };
 
     if (playerRefFunc?.current === null) {
-      const initPlayer: TwitchPlayer = new (
-        window as TwitchPlayer
-      ).Twitch.Player("player", options);
+      const initPlayer = new (window as any).Twitch.Player("player", options);
       playerRefFunc.current = initPlayer;
     }
   }, [videoId]);
