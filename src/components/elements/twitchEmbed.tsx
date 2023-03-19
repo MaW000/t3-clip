@@ -17,11 +17,9 @@ interface TwitchPlayer {
 export const TwitchEmbed = ({
   videoId,
   playerRef,
-  playerRefFunc,
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.RefObject<(() => void) | null> | null;
 }) => {
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
@@ -37,7 +35,6 @@ export const TwitchEmbed = ({
 
     if (playerRefFunc?.current === null) {
       const initPlayer = new (window as any).Twitch.Player("player", options);
-      playerRefFunc.current = initPlayer;
     }
   }, [videoId]);
 
