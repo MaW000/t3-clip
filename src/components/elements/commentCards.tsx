@@ -44,7 +44,7 @@ export const CommentCards = ({
 
   player,
 }: {
-  player: Twitch;
+  player: Twitch | null;
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
@@ -66,7 +66,6 @@ export const CommentCards = ({
   });
   const getCardComments = api.card.getCardComments.useMutation({
     onSuccess: (data) => {
-      
       const updatedCards =
         cards.map((card) => {
           if (!data[0]) return { ...card };
