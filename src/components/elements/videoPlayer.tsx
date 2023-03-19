@@ -9,14 +9,14 @@ interface TwitchPlayera {
   // Add any other properties or methods that you need
 }
 
-interface TwitchPlayer {
+interface Twitch {
   seek(time: number): void | null;
 }
 export const VideoDash = ({ videoId }: { videoId: number }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const [player, setPlayer] = useState(null);
+  const [player, setPlayer] = useState<Twitch>({});
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
 
