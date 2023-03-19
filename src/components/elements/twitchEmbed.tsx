@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
 
 export const TwitchEmbed = ({
@@ -6,11 +6,13 @@ export const TwitchEmbed = ({
   setPlayer,
   player,
   playerRef,
+  playerRefFunc,
 }: {
   videoId: number;
   setPlayer: SetPlayerFn;
   player: TwitchPlayer | null;
   playerRef: React.RefObject<HTMLDivElement>;
+  playerRefFunc: React.MutableRefObject<TwitchPlayer | null>;
 }) => {
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
@@ -24,19 +26,11 @@ export const TwitchEmbed = ({
       time: "0h0m1s",
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const initPlayer = new (window as any).Twitch.Player("player", options);
-
-    if (player === null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      setPlayer(initPlayer);
+    if (playerRefFunc.current === null) {
+      const initPlayer = new (window as any).Twitch.Player("player", options);
+      playerRefFunc.current = initPlayer;
     }
-
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      initPlayer.destroy();
-    };
-  }, [videoId, player, setPlayer]);
+  }, [videoId]);
 
   return (
     <div

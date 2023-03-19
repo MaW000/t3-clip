@@ -1,5 +1,6 @@
 import { api } from "~/utils/api";
 import { useState, useEffect } from "react";
+import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
 interface Card {
   id: string;
   vidId: string;
@@ -31,14 +32,18 @@ type Message = {
   commenter: string | null;
   contentOffsetSeconds: number;
 };
-
+interface Twitch {
+  seek(time: number): void;
+}
 import Image from "next/image";
 export const CommentCards = ({
   videoId,
   playerRef,
+  playerRefFunc,
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
+  playerRefFunc: React.MutableRefObject<TwitchPlayer | null>;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
@@ -77,7 +82,7 @@ export const CommentCards = ({
     },
   });
   const [cards, setCards] = useState<Card[]>([]);
-
+  console.log(playerRefFunc);
   const { data: queryData } = api.card.getCards.useQuery({
     videoId: videoId,
   });
@@ -87,8 +92,26 @@ export const CommentCards = ({
     }
   }, [queryData]);
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
-  console.log(cards);
-
+  console.log(queryData);
+  const handleClearMessages = (card, timestamp) => {
+    const updatedCardsf =
+      cards.map((cardx) => {
+        if (cardx.id === card.id) {
+          const updatedTimestamps = card.timestamps?.map((timestampx) => {
+            if (timestampx.timestamp === timestamp.timestamp) {
+              timestampx.messages = null;
+            }
+            return timestampx;
+          });
+          return {
+            ...card,
+            timestamps: updatedTimestamps,
+          };
+        }
+        return cardx;
+      }) ?? null;
+    setCards(updatedCardsf);
+  };
   // if (cards.length === 0) setCards(queryData);
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">
@@ -229,9 +252,21 @@ export const CommentCards = ({
                     return (
                       <div
                         key={timestamp.id}
-                        className="around flex justify-center"
+                        className=" flex justify-center gap-5 "
                       >
                         <button
+                          className="text-blue-400 underline"
+                          onClick={() =>
+                            playerRefFunc.current.seek(
+                              timestamp.contentOffsetSeconds
+                            )
+                          }
+                        >
+                          {timestamp.timestamp}
+                        </button>
+                        <h1 className="text-red-500">{timestamp.count}</h1>
+                        <button
+                          className="text-blue-400 underline"
                           onClick={() =>
                             getCardComments.mutate({
                               cardId: card.id,
@@ -239,10 +274,8 @@ export const CommentCards = ({
                             })
                           }
                         >
-                          {timestamp.timestamp}
+                          Show Comments
                         </button>
-                        <h1>{timestamp.count}</h1>
-                        <button>Show Comments</button>
                       </div>
                     );
                   } else {
@@ -254,16 +287,19 @@ export const CommentCards = ({
                         <div className="around flex justify-center">
                           <button
                             onClick={() =>
-                              getCardComments.mutate({
-                                cardId: card.id,
-                                timestamp: timestamp.timestamp,
-                              })
+                              playerRefFunc.current.seek(
+                                timestamp.contentOffsetSeconds
+                              )
                             }
                           >
                             {timestamp.timestamp}
                           </button>
                           <h1>{timestamp.count}</h1>
-                          <button>Show Comments</button>
+                          <button
+                            onClick={() => handleClearMessages(card, timestamp)}
+                          >
+                            Hide Messages
+                          </button>
                         </div>
                         <div>
                           {timestamp.messages.map((message) => {
