@@ -61,7 +61,7 @@ export const CommentCards = ({
   if (!cards) setCards(queryData);
   const x = playerRef.current.clientHeight - 200;
   console.log(x);
-  if (!cards) return;
+  if (!cards) return <h1>loading cards</h1>
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
