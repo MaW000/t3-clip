@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
+import type { RefObject } from "react";
 import { VodParse, TwitchEmbed, EmoteCarousel } from "@/elements";
 import { api } from "~/utils/api";
 interface TwitchPlayer {
@@ -7,16 +8,16 @@ interface TwitchPlayer {
   destroy: () => void;
   // Add any other properties or methods that you need
 }
-interface Twitch {
-  current?: {
-    seek(time: number): void;
-  };
+
+interface TwitchPlayer {
+  seek(time: number): void;
 }
 export const VideoDash = ({ videoId }: { videoId: number }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const playerRefFunc: React.RefObject<Twitch> | null = useRef(null);
+  const playerRefFunc = useRef<(() => void) | null>(null);
+
   return (
     <div className="relative">
       <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
