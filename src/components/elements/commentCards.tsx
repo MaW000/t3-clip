@@ -93,7 +93,7 @@ export const CommentCards = ({
       setCards(queryData);
     }
   }, [queryData]);
-  if (!playerRef.current?.clientWidth || !playerRefFunc.current)
+  if (!playerRef.current?.clientWidth || !playerRefFunc?.current)
     return <h1>hi</h1>;
   console.log(queryData);
   const handleClearMessages = (card: Card, timestamp: Timestamp) => {
