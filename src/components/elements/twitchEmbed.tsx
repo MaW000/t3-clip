@@ -1,20 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
+
 interface Twitch {
-  current: {
+  current?: {
     seek(time: number): void;
   };
 }
 export const TwitchEmbed = ({
   videoId,
-  setPlayer,
-  player,
   playerRef,
   playerRefFunc,
 }: {
   videoId: number;
-  setPlayer: SetPlayerFn;
-  player: TwitchPlayer | null;
   playerRef: React.RefObject<HTMLDivElement>;
   playerRefFunc: Twitch | null;
 }) => {

@@ -33,7 +33,7 @@ type Message = {
   contentOffsetSeconds: number;
 };
 interface Twitch {
-  current: {
+  current?: {
     seek(time: number): void;
   };
 }

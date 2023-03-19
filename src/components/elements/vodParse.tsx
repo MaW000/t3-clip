@@ -3,7 +3,7 @@ import { ProgressBar, CommentCards } from "@/elements";
 
 import { api } from "~/utils/api";
 interface Twitch {
-  current: {
+  current?: {
     seek(time: number): void;
   };
 }

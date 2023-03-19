@@ -8,7 +8,7 @@ interface TwitchPlayer {
   // Add any other properties or methods that you need
 }
 interface Twitch {
-  current: {
+  current?: {
     seek(time: number): void;
   };
 }
@@ -17,7 +17,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const playerRefFunc = useRef<Twitch | null>(null);
+  const playerRefFunc = useRef<Twitch>(null);
   return (
     <div className="relative">
       <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
