@@ -30,12 +30,12 @@ export const TwitchEmbed = ({
       time: "0h0m1s",
     };
 
-    if (playerRefFunc.current === null) {
+    if (playerRefFunc?.current === null) {
       const initPlayer = new (window as any).Twitch.Player("player", options);
       playerRefFunc.current = initPlayer;
     }
     return () => {
-      if (playerRefFunc.current !== null) {
+      if (playerRefFunc?.current !== null) {
         playerRefFunc.current.destroy();
         playerRefFunc.current = null;
       }
