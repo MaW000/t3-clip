@@ -28,10 +28,10 @@ type Message = {
   cardIds: string[];
   message: string;
   commentId: string;
-  commenter: string;
+  commenter: string | null;
   contentOffsetSeconds: number;
 };
-import type { Term } from "~/types/emote";
+
 import Image from "next/image";
 export const CommentCards = ({
   videoId,
@@ -267,7 +267,6 @@ export const CommentCards = ({
                         </div>
                         <div>
                           {timestamp.messages.map((message) => {
-                            console.log(message);
                             return (
                               <div key={message.id}>
                                 <h1>{message.message}</h1>
