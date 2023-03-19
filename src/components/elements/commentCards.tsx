@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 interface Card {
   id: string;
   vidId: string;
@@ -20,7 +20,17 @@ interface Timestamp {
   cardId: string;
   vidId: string;
   msgIds: string[];
+  messages?: Message[] | null;
 }
+type Message = {
+  id: string;
+  vidId: string;
+  cardIds: string[];
+  message: string;
+  commentId: string;
+  commenter: string;
+  contentOffsetSeconds: number;
+};
 import type { Term } from "~/types/emote";
 import Image from "next/image";
 export const CommentCards = ({
@@ -30,35 +40,56 @@ export const CommentCards = ({
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const [cards, setCards] = useState<Card[]>([]);
-
-  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
       const updatedCards =
         cards?.map((card) => {
           if (!data[0]) return { ...card };
           if (card.id === data[0].cardId) {
-            // create a new card object with updated timestamps
             const updatedCard = { ...card };
             updatedCard.timestamps = data;
-
             return updatedCard;
           } else {
-            // return the original card object for all other cards
             return card;
           }
         }) ?? null;
-
       setCards(updatedCards);
     },
   });
+  const getCardComments = api.card.getCardComments.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+      const updatedCards =
+        cards.map((card) => {
+          if (!data[0]) return { ...card };
+          if (card.id === data[0].cardId) {
+            const updatedTimestamps = card.timestamps?.map((timestamp) => {
+              if (timestamp.timestamp === data[0]?.timestamp) {
+                timestamp.messages = data[0].messages;
+              }
+              return timestamp;
+            });
+            return { ...card, timestamps: updatedTimestamps };
+          }
+          return card;
+        }) ?? null;
+      setCards(updatedCards);
+    },
+  });
+  const [cards, setCards] = useState<Card[]>([]);
 
-  const { data: queryData } = api.card.getCards.useQuery({ videoId: videoId });
-  if (!queryData) return <h1>Loading...</h1>;
-  if (cards.length === 0) setCards(queryData);
-  const x = playerRef.current.clientHeight - 200;
-  console.log(queryData);
+  const { data: queryData } = api.card.getCards.useQuery({
+    videoId: videoId,
+  });
+  useEffect(() => {
+    if (queryData) {
+      setCards(queryData);
+    }
+  }, [queryData]);
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
+  console.log(cards);
+
+  // if (cards.length === 0) setCards(queryData);
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
@@ -194,11 +225,60 @@ export const CommentCards = ({
               </button>
               <div className="scrollbar-x max-h-56 overflow-y-scroll bg-slate-900">
                 {card.timestamps?.map((timestamp) => {
-                  return (
-                    <div key={timestamp.id}>
-                      <button>{timestamp.timestamp}</button>
-                    </div>
-                  );
+                  if (!timestamp.messages) {
+                    return (
+                      <div
+                        key={timestamp.id}
+                        className="around flex justify-center"
+                      >
+                        <button
+                          onClick={() =>
+                            getCardComments.mutate({
+                              cardId: card.id,
+                              timestamp: timestamp.timestamp,
+                            })
+                          }
+                        >
+                          {timestamp.timestamp}
+                        </button>
+                        <h1>{timestamp.count}</h1>
+                        <button>Show Comments</button>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={timestamp.id}
+                        className="border border-slate-600 bg-slate-500 py-1 text-periwinkle-gray-500"
+                      >
+                        <div className="around flex justify-center">
+                          <button
+                            onClick={() =>
+                              getCardComments.mutate({
+                                cardId: card.id,
+                                timestamp: timestamp.timestamp,
+                              })
+                            }
+                          >
+                            {timestamp.timestamp}
+                          </button>
+                          <h1>{timestamp.count}</h1>
+                          <button>Show Comments</button>
+                        </div>
+                        <div>
+                          {timestamp.messages.map((message) => {
+                            console.log(message);
+                            return (
+                              <div key={message.id}>
+                                <h1>{message.message}</h1>
+                                <h1>{message.commenter}</h1>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>
