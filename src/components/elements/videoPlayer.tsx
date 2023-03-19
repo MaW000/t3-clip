@@ -13,19 +13,16 @@ interface Twitch {
   };
 }
 export const VideoDash = ({ videoId }: { videoId: number }) => {
-  const [player, setPlayer] = useState<TwitchPlayer | null>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const playerRefFunc = useRef<Twitch>(null);
+  const playerRefFunc: React.RefObject<Twitch> | null = useRef(null);
   return (
     <div className="relative">
       <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
         <TwitchEmbed
-          player={player}
           playerRef={playerRef}
           playerRefFunc={playerRefFunc}
-          setPlayer={setPlayer}
           videoId={videoId}
         />
         <VodParse

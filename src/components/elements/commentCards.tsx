@@ -45,7 +45,7 @@ export const CommentCards = ({
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: Twitch;
+  playerRefFunc: React.RefObject<Twitch> | null;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {

@@ -16,7 +16,7 @@ export const VodParse = ({
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: Twitch | null;
+  playerRefFunc:  React.RefObject<Twitch> | null;
 }) => {
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
