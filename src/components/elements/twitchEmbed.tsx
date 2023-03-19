@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useStte } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface Twitch {
   current?: {
