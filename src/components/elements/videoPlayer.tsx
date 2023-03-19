@@ -16,7 +16,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const [player, setPlayer] = useState<TwitchPlayer | null>(null);
+  const [player, setPlayer] = useState<any>(null);
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
 
