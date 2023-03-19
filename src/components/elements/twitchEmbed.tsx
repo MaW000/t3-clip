@@ -36,8 +36,8 @@ export const TwitchEmbed = ({
     }
     return () => {
       if (playerRefFunc?.current !== null) {
-        playerRefFunc.current.destroy();
-        playerRefFunc.current = null;
+        playerRefFunc?.current?.destroy();
+        playerRefFunc?.current = null;
       }
     };
   }, [videoId]);
