@@ -10,13 +10,12 @@ interface TwitchPlayera {
 }
 
 interface TwitchPlayer {
-  seek(time: number): void;
+  seek(time: number): void | null;
 }
 export const VideoDash = ({ videoId }: { videoId: number }) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
-  const playerRefFunc = useRef<HTMLDivElement | null>(null);
   const [player, setPlayer] = useState<TwitchPlayer | null>(null);
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
@@ -38,7 +37,6 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
     }
     return () => {
       if (initPlayer !== null) {
-        setPlayer(initPlayer);
         initPlayer.destroy();
       }
     };
@@ -54,7 +52,6 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         ></div>
 
         <VodParse
-          playerRefFunc={playerRefFunc}
           player={player}
           playerRef={playerRef}
           videoId={videoId}

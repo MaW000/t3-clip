@@ -41,13 +41,12 @@ import Image from "next/image";
 export const CommentCards = ({
   videoId,
   playerRef,
-  playerRefFunc,
+
   player,
 }: {
   player: Twitch;
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.RefObject<Twitch>;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
@@ -67,7 +66,7 @@ export const CommentCards = ({
   });
   const getCardComments = api.card.getCardComments.useMutation({
     onSuccess: (data) => {
-      console.log(data);
+      
       const updatedCards =
         cards.map((card) => {
           if (!data[0]) return { ...card };
@@ -86,7 +85,7 @@ export const CommentCards = ({
     },
   });
   const [cards, setCards] = useState<Card[]>([]);
-  console.log(playerRefFunc);
+
   const { data: queryData } = api.card.getCards.useQuery({
     videoId: videoId,
   });
@@ -96,7 +95,7 @@ export const CommentCards = ({
     }
   }, [queryData]);
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
-  console.log(queryData);
+
   const handleClearMessages = (card: Card, timestamp: Timestamp) => {
     const updatedCardsf =
       cards.map((cardx) => {

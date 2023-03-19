@@ -9,14 +9,14 @@ export const VodParse = ({
   videoId,
   completed,
   playerRef,
-  playerRefFunc,
+
   player,
 }: {
   player: Twitch;
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.RefObject<Twitch> | null;
+
 }) => {
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
@@ -42,7 +42,7 @@ export const VodParse = ({
         playerRef={playerRef}
         videoId={videoId}
         player={player}
-        playerRefFunc={playerRefFunc}
+  
       />
 
       {/* <button
