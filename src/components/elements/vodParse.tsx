@@ -2,6 +2,11 @@ import React from "react";
 import { ProgressBar, CommentCards } from "@/elements";
 
 import { api } from "~/utils/api";
+interface Twitch {
+  current: {
+    seek(time: number): void;
+  };
+}
 export const VodParse = ({
   videoId,
   completed,
@@ -11,7 +16,7 @@ export const VodParse = ({
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.MutableRefObject<TwitchPlayer | null>;
+  playerRefFunc: Twitch | null;
 }) => {
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({

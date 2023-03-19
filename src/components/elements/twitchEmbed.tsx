@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
-
+interface Twitch {
+  current: {
+    seek(time: number): void;
+  };
+}
 export const TwitchEmbed = ({
   videoId,
   setPlayer,
@@ -12,7 +16,7 @@ export const TwitchEmbed = ({
   setPlayer: SetPlayerFn;
   player: TwitchPlayer | null;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.MutableRefObject<TwitchPlayer | null>;
+  playerRefFunc: Twitch | null;
 }) => {
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
@@ -30,6 +34,12 @@ export const TwitchEmbed = ({
       const initPlayer = new (window as any).Twitch.Player("player", options);
       playerRefFunc.current = initPlayer;
     }
+    return () => {
+      if (playerRefFunc.current !== null) {
+        playerRefFunc.current.destroy();
+        playerRefFunc.current = null;
+      }
+    };
   }, [videoId]);
 
   return (

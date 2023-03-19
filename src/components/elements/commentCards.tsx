@@ -33,7 +33,9 @@ type Message = {
   contentOffsetSeconds: number;
 };
 interface Twitch {
-  seek(time: number): void;
+  current: {
+    seek(time: number): void;
+  };
 }
 import Image from "next/image";
 export const CommentCards = ({
@@ -43,7 +45,7 @@ export const CommentCards = ({
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.MutableRefObject<TwitchPlayer | null>;
+  playerRefFunc: Twitch;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
