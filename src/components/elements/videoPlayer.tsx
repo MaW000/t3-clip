@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
-import type { RefObject } from "react";
-import { VodParse, TwitchEmbed, EmoteCarousel } from "@/elements";
+
+import { VodParse, EmoteCarousel } from "@/elements";
 import { api } from "~/utils/api";
 interface TwitchPlayera {
   play: () => void;
