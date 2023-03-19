@@ -1,6 +1,5 @@
 import { api } from "~/utils/api";
 import { useState, useEffect } from "react";
-import type { SetPlayerFn, TwitchPlayer } from "~/types/twitchEmbed";
 interface Card {
   id: string;
   vidId: string;
@@ -33,6 +32,7 @@ type Message = {
   contentOffsetSeconds: number;
 };
 interface Twitch {
+  seek(time: number): void;
   current?: {
     seek(time: number): void;
   } | null;

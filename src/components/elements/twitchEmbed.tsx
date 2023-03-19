@@ -4,6 +4,15 @@ interface Twitch {
   current?: {
     seek(time: number): void;
   };
+  Player(player: string, options: any): void;
+}
+interface TwitchPlayer {
+  Player: {
+    new (id: string, options: string): string;
+  };
+  Current?: {
+    seek(time: number): void;
+  };
 }
 export const TwitchEmbed = ({
   videoId,
@@ -27,7 +36,7 @@ export const TwitchEmbed = ({
     };
 
     if (playerRefFunc?.current === null) {
-      const initPlayer = new (window as any).Twitch.Player("player", options);
+      const initPlayer: TwitchPlayer = new Twitch.Player("player", options);
       playerRefFunc.current = initPlayer;
     }
   }, [videoId]);
