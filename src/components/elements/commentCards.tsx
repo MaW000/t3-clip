@@ -258,7 +258,7 @@ export const CommentCards = ({
                         <button
                           className="text-blue-400 underline"
                           onClick={() =>
-                            playerRefFunc.current.seek(
+                            playerRefFunc?.current?.seek(
                               timestamp.contentOffsetSeconds
                             )
                           }
@@ -288,7 +288,7 @@ export const CommentCards = ({
                         <div className="around flex justify-center">
                           <button
                             onClick={() =>
-                              playerRefFunc.current.seek(
+                              playerRefFunc?.current?.seek(
                                 timestamp.contentOffsetSeconds
                               )
                             }
