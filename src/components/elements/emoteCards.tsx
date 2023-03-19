@@ -10,7 +10,7 @@ export const EmoteCards = ({
   videoId: number;
 }) => {
   const [updatedTerms, setUpdatedTerms] = useState<Term[]>(terms);
-  console.log(terms, updatedTerms);
+
   useEffect(() => {
     if (!terms) return;
     terms.sort((a, b) => b.amount - a.amount);

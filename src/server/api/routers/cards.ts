@@ -30,5 +30,19 @@ export const cardRouter = createTRPCRouter({
       if (!cards) return;
 
       return cards;
+    }),
+  getCard: publicProcedure
+    .input(
+      z.object({
+        cardId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      console.log(input)
+      return await ctx.prisma.commentCard.findMany({
+        where: {
+          cardId: input.cardId,
+        }
+      })
     })
 });
