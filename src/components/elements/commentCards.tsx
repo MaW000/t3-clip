@@ -42,26 +42,23 @@ export const CommentCards = ({
             // create a new card object with updated timestamps
             const updatedCard = { ...card };
             updatedCard.timestamps = data;
-            console.log;
+
             return updatedCard;
           } else {
             // return the original card object for all other cards
             return card;
           }
         }) ?? null;
-      console.log(updatedCards);
+
       setCards(updatedCards);
     },
   });
 
-  // const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
-  // console.log(videoSaveRes);
   const { data: queryData } = api.card.getCards.useQuery({ videoId: videoId });
   if (!queryData) return <h1>Loading...</h1>;
-  if (!cards) setCards(queryData);
+  if (cards.length === 0) setCards(queryData);
   const x = playerRef.current.clientHeight - 200;
-  console.log(x);
-  if (!cards) return <h1>loading cards</h1>
+  console.log(queryData);
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
@@ -197,7 +194,6 @@ export const CommentCards = ({
               </button>
               <div className="scrollbar-x max-h-56 overflow-y-scroll bg-slate-900">
                 {card.timestamps?.map((timestamp) => {
-                  console.log(timestamp);
                   return (
                     <div key={timestamp.id}>
                       <button>{timestamp.timestamp}</button>

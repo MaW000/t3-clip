@@ -38,7 +38,7 @@ export const cardRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(input)
+
       return await ctx.prisma.commentCard.findMany({
         where: {
           cardId: input.cardId,

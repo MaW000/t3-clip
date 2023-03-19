@@ -9,7 +9,7 @@ const VideoPage: NextPage = () => {
   const [toggle, setToggle] = useState(false);
   const router = useRouter();
   const { id } = router.query;
-
+  console.log(id)
   const videoId = Array.isArray(id) ? parseInt(id.join("")) : id ?? "";
   if (!videoId || typeof videoId === "string") return <h1>Wrong Id</h1>;
   return (
