@@ -24,7 +24,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         <TwitchEmbed
           player={player}
           playerRef={playerRef}
-          playerRefFunc={playerRefFunc as React.MutableRefObject<Twitch>}
+          playerRefFunc={playerRefFunc}
           setPlayer={setPlayer}
           videoId={videoId}
         />
