@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import type { RefObject } from "react";
 import { VodParse, TwitchEmbed, EmoteCarousel } from "@/elements";
 import { api } from "~/utils/api";
-interface TwitchPlayer {
+interface TwitchPlayera {
   play: () => void;
   pause: () => void;
   destroy: () => void;
@@ -17,6 +17,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
   const playerRefFunc = useRef<HTMLDivElement | null>(null);
+  const [player, setPlayer] = useState<TwitchPlayer | null>(null);
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
 
@@ -29,11 +30,20 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
       time: "0h0m1s",
     };
 
-    if (playerRefFunc?.current === null) {
-      const initPlayer = new (window as any).Twitch.Player("player", options);
-      playerRefFunc.current = initPlayer;
+    const initPlayer = new (window as any).Twitch.Player("player", options);
+    setPlayer(initPlayer);
+    if (player === null && playerRef.current !== null) {
+      // playerRefFunc.current = initPlayer;
+      // setPlayer(new (window as any).Twitch.Player("player", options));
     }
+    return () => {
+      if (initPlayer !== null) {
+        setPlayer(initPlayer);
+        initPlayer.destroy();
+      }
+    };
   }, [videoId]);
+
   return (
     <div className="relative">
       <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
@@ -45,6 +55,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
 
         <VodParse
           playerRefFunc={playerRefFunc}
+          player={player}
           playerRef={playerRef}
           videoId={videoId}
           completed={response}

@@ -3,20 +3,20 @@ import { ProgressBar, CommentCards } from "@/elements";
 
 import { api } from "~/utils/api";
 interface Twitch {
-  current?: {
-    seek(time: number): void;
-  };
+  seek(time: number): void;
 }
 export const VodParse = ({
   videoId,
   completed,
   playerRef,
   playerRefFunc,
+  player,
 }: {
+  player: Twitch;
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc:  React.RefObject<Twitch> | null;
+  playerRefFunc: React.RefObject<Twitch> | null;
 }) => {
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
@@ -41,6 +41,7 @@ export const VodParse = ({
       <CommentCards
         playerRef={playerRef}
         videoId={videoId}
+        player={player}
         playerRefFunc={playerRefFunc}
       />
 

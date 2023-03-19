@@ -42,7 +42,9 @@ export const CommentCards = ({
   videoId,
   playerRef,
   playerRefFunc,
+  player,
 }: {
+  player: Twitch;
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
   playerRefFunc: React.RefObject<Twitch>;
@@ -93,8 +95,7 @@ export const CommentCards = ({
       setCards(queryData);
     }
   }, [queryData]);
-  if (!playerRef.current?.clientWidth || !playerRefFunc?.current)
-    return <h1>hi</h1>;
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   console.log(queryData);
   const handleClearMessages = (card: Card, timestamp: Timestamp) => {
     const updatedCardsf =
@@ -260,9 +261,7 @@ export const CommentCards = ({
                         <button
                           className="text-blue-400 underline"
                           onClick={() =>
-                            playerRefFunc.current?.seek(
-                              timestamp.contentOffsetSeconds
-                            )
+                            player?.seek(timestamp.contentOffsetSeconds)
                           }
                         >
                           {timestamp.timestamp}
@@ -290,9 +289,7 @@ export const CommentCards = ({
                         <div className="around flex justify-center">
                           <button
                             onClick={() =>
-                              playerRefFunc.current?.seek(
-                                timestamp.contentOffsetSeconds
-                              )
+                              player?.seek(timestamp.contentOffsetSeconds)
                             }
                           >
                             {timestamp.timestamp}
