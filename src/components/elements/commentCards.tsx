@@ -40,7 +40,7 @@ export const CommentCards = ({
           if (card.id === data[0].cardId) {
             // create a new card object with updated timestamps
             const updatedCard = { ...card };
-            updatedCard.timestamps = data;
+            updatedCard.timestamps = data || [];
             console.log;
             return updatedCard;
           } else {
@@ -193,7 +193,7 @@ export const CommentCards = ({
                   </div>
                 </div>
               </button>
-              <div className="scrollbar-x max-h-56 overflow-y-scroll">
+              <div className="scrollbar-x max-h-56 overflow-y-scroll bg-slate-900">
                 {card.timestamps?.map((timestamp) => {
                   console.log(timestamp);
                   return (
