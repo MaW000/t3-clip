@@ -11,7 +11,7 @@ const VideoPage: NextPage = () => {
   const { id } = router.query;
 
   const videoId = Array.isArray(id) ? parseInt(id.join("")) : id ?? "";
-
+  if (!videoId || typeof videoId === "string") return <h1>Wrong Id</h1>;
   return (
     <>
       <Head>
