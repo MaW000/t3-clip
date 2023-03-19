@@ -12,11 +12,10 @@ export const VodParse = ({
 
   player,
 }: {
-  player: Twitch;
+  player: Twitch | null;
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
-
 }) => {
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
@@ -38,12 +37,7 @@ export const VodParse = ({
     >
       {completed && <ProgressBar videoId={videoId} />}
 
-      <CommentCards
-        playerRef={playerRef}
-        videoId={videoId}
-        player={player}
-  
-      />
+      <CommentCards playerRef={playerRef} videoId={videoId} player={player} />
 
       {/* <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
