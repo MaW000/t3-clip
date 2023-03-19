@@ -35,7 +35,7 @@ type Message = {
 interface Twitch {
   current?: {
     seek(time: number): void;
-  };
+  } | null;
 }
 import Image from "next/image";
 export const CommentCards = ({
@@ -45,7 +45,7 @@ export const CommentCards = ({
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.RefObject<Twitch> | null;
+  playerRefFunc: React.RefObject<Twitch>;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
@@ -260,7 +260,7 @@ export const CommentCards = ({
                         <button
                           className="text-blue-400 underline"
                           onClick={() =>
-                            playerRefFunc?.current?.seek(
+                            playerRefFunc.current?.seek(
                               timestamp.contentOffsetSeconds
                             )
                           }
@@ -290,7 +290,7 @@ export const CommentCards = ({
                         <div className="around flex justify-center">
                           <button
                             onClick={() =>
-                              playerRefFunc?.current?.seek(
+                              playerRefFunc.current?.seek(
                                 timestamp.contentOffsetSeconds
                               )
                             }
