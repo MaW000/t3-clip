@@ -21,7 +21,7 @@ export const TwitchEmbed = ({
 }: {
   videoId: number;
   playerRef: React.RefObject<HTMLDivElement>;
-  playerRefFunc: React.RefObject<Twitch> | null;
+  playerRefFunc: React.RefObject<(() => void) | null> | null;
 }) => {
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
