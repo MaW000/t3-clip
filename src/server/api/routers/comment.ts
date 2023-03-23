@@ -57,7 +57,7 @@ export const commentRouter = createTRPCRouter({
             if (cardCurr || !emoteDb) return
 
 
-            console.log(emoteDb)
+           
 
             console.log("fetching messages");
             const video = await ctx.prisma.video.findUnique({

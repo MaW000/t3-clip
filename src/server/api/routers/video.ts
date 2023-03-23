@@ -28,7 +28,7 @@ export const videoRouter = createTRPCRouter({
 
         return true
       } else if (!toggle.complete) {
-        return false
+        return true
       } else {
         return false
       }
@@ -498,6 +498,7 @@ export const videoRouter = createTRPCRouter({
         }
         //saves comments to db and pushes id to global set for filtering
         async function saveFilter() {
+          console.log('proper save')
           const uniqueComments: Message[] = [];
           comments.forEach((comment) => {
             if (!seenCommentIds.has(comment.commentId)) {
@@ -505,19 +506,23 @@ export const videoRouter = createTRPCRouter({
               seenCommentIds.add(comment.commentId);
             }
           });
-          await ctx.prisma.msg.createMany({
-            data: uniqueComments,
-          });
+          if (uniqueComments.length > 0) {
+
+            await ctx.prisma.msg.createMany({
+              data: uniqueComments,
+            });
+          }
           comments = [];
         }
 
         await pusher.trigger(`${input.videoId}`, "closeVod", true);
         if (comments.length > 0) {
+          console.log('last save', comments)
           await saveFilter();
         }
 
         await ctx.prisma.video.update({
-          where: { videoId: input.videoId },
+          where: { videoId: +input.videoId },
           data: { complete: true },
         })
         console.log('saving complete')

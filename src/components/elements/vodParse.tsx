@@ -38,8 +38,8 @@ export const VodParse = ({
       {completed && <ProgressBar videoId={videoId} />}
 
       <CommentCards playerRef={playerRef} videoId={videoId} player={player} />
-
-      {/* <button
+      {/* 
+      <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >
