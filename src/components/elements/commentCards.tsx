@@ -279,21 +279,22 @@ export const CommentCards = ({
                       </div>
                     );
                   } else {
+                    console.log(timestamp.messages[0])
                     return (
                       <div
                         key={timestamp.id}
-                        className="border border-slate-600 bg-slate-500 py-1 text-periwinkle-gray-500"
+                        className="border border-slate-600 mx-2 py-1 text-periwinkle-gray-500"
                       >
-                        <div className="around flex justify-center">
-                          <button
+                        <div className="around flex gap-5 justify-center">
+                          <button className="underline text-blue-400"
                             onClick={() =>
                               player?.seek(timestamp.contentOffsetSeconds)
                             }
                           >
                             {timestamp.timestamp}
                           </button>
-                          <h1>{timestamp.count}</h1>
-                          <button
+                          <h1 className="text-red-400">{timestamp.count}</h1>
+                          <button className="underline text-blue-400"
                             onClick={() => handleClearMessages(card, timestamp)}
                           >
                             Hide Messages
@@ -302,9 +303,9 @@ export const CommentCards = ({
                         <div>
                           {timestamp.messages.map((message) => {
                             return (
-                              <div key={message.id}>
+                              <div className="flex mx-5" key={message.id}>
+                                <h1 className="mr-1 font-bold">{message.commenter}:</h1>
                                 <h1>{message.message}</h1>
-                                <h1>{message.commenter}</h1>
                               </div>
                             );
                           })}
