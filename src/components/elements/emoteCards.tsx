@@ -27,10 +27,8 @@ export const EmoteCards = ({
   }, [terms, cards]);
   const comments = api.comment.getComments.useMutation({
     onSuccess: (data) => {
-    
-      if (!data) return;
+      if (!data || "message" in data) return;
       const newCards = [...cards, data];
-      // const newCards: Card[] = cards.push(data);
       setCards(newCards);
     },
   });
