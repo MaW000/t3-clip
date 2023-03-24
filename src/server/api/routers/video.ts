@@ -53,7 +53,7 @@ export const videoRouter = createTRPCRouter({
             .catch((error) => console.error(error));
           if (!userData) return
           const info = userData
-          console.log('chanell info avatar set')
+   
           await ctx.prisma.channel.update({
             where: { streamer: info.displayName },
             data: { avatar: info.avatar, seId: info._id, }
@@ -108,7 +108,7 @@ export const videoRouter = createTRPCRouter({
           if (uniqueEmoteData.length > 0) {
 
             const a = await ctx.prisma.emote.createMany({ data: uniqueEmoteData as EmoteCreateManyInput[] })
-            console.log('new Emotes created', a)
+    
           } else {
             const { log } = console
             log('no new Emotes from this user')
@@ -153,7 +153,7 @@ export const videoRouter = createTRPCRouter({
             });
 
             if (!channel) {
-              console.log('new channel created')
+   
               const newStreamer = await ctx.prisma.channel.create({
                 data: { streamer: vidInfo.user_name },
               });
@@ -174,10 +174,10 @@ export const videoRouter = createTRPCRouter({
               url: vidInfo.url,
               createdAt: vidInfo.created_at,
             };
-            console.log('newvideo created')
+    
             const video = await ctx.prisma.video.create({ data: data });
             if (channel) {
-              console.log('video updated to channel')
+         
               await ctx.prisma.channel.update({
                 where: { id: channel.id },
                 data: { videoIds: { push: video.id } },
@@ -255,7 +255,7 @@ export const videoRouter = createTRPCRouter({
         const c = mapEmotes(termData.twitchEmotes, "twitch");
         const a = mapEmotes(termData.bttvEmotes, "bttv");
         const d = b.concat(c, a);
-        console.log('new terms/hashtags created')
+
         await ctx.prisma.hashtag.createMany({ data: hashtags });
         await ctx.prisma.term.createMany({
           data: d,
@@ -267,7 +267,7 @@ export const videoRouter = createTRPCRouter({
         const hashtagIds = await ctx.prisma.hashtag.findMany({ where: { channelId: channelObjectId }, select: { id: true } })
         const hashtagIdArray = hashtagIds.map((hashtag) => ({ id: hashtag.id }));
 
-        console.log('terms/hashtags updated to channel')
+    
         await ctx.prisma.channel.update({
           where: {
             id: channelObjectId
@@ -436,13 +436,13 @@ export const videoRouter = createTRPCRouter({
           const sumHead = midSecond - midBackwardSec + firstSecond;
           const sumTail = vidLength - endSecond + midForwardSec;
           const percent = calculatePercentage(sumHead, sumTail);
-          console.log(percent)
+    
           if (percent >= p + 1) {
-            console.log(percent)
+        
             try {
               await pusher.trigger(`${input.videoId}`, "update", percent);
             } catch (err) {
-              console.log(err)
+              console.error(err)
             }
             p = percent;
           }
@@ -498,7 +498,7 @@ export const videoRouter = createTRPCRouter({
         }
         //saves comments to db and pushes id to global set for filtering
         async function saveFilter() {
-          console.log('proper save')
+      
           const uniqueComments: Message[] = [];
           comments.forEach((comment) => {
             if (!seenCommentIds.has(comment.commentId)) {
@@ -517,7 +517,7 @@ export const videoRouter = createTRPCRouter({
 
         await pusher.trigger(`${input.videoId}`, "closeVod", true);
         if (comments.length > 0) {
-          console.log('last save', comments)
+    
           await saveFilter();
         }
 
@@ -525,7 +525,7 @@ export const videoRouter = createTRPCRouter({
           where: { videoId: +input.videoId },
           data: { complete: true },
         })
-        console.log('saving complete')
+   
       }
     }),
   getAll: publicProcedure
@@ -587,7 +587,7 @@ export const videoRouter = createTRPCRouter({
         await ctx.prisma.channel.deleteMany({
           where: { id: video.channelId },
         });
-        console.log("delete complete");
+  
       }
 
       return {
@@ -597,8 +597,8 @@ export const videoRouter = createTRPCRouter({
   fetch: publicProcedure
     .input(z.object({ videoId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      console.log(input)
-      console.log("fetching");
+
+   
       const commentCards = await ctx.prisma.commentCard.findMany({
         where: {
           cardId: "6411f36b4c068fec0b6fc0af",
@@ -613,7 +613,7 @@ export const videoRouter = createTRPCRouter({
           count: "asc"
         },
       })
-      console.log(commentCards[0]?.messages)
+  
       return {
         response: 'dog',
       };

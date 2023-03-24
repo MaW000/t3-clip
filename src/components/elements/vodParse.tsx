@@ -1,33 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ProgressBar, CommentCards } from "@/elements";
 
 import { api } from "~/utils/api";
-interface Twitch {
-  seek(time: number): void;
-}
+import type {
+  Twitch,
+  Card,
+  Timestamp,
+  Message,
+  SetCardsFunction,
+} from "~/types/commentCard";
+
 export const VodParse = ({
   videoId,
   completed,
   playerRef,
-
+  cards,
+  setCards,
   player,
 }: {
+  cards: Card[];
+  setCards: SetCardsFunction;
   player: Twitch | null;
   videoId: number;
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
   const getComments = api.comment.getComments.useMutation({
     onSuccess: () => console.log("success"),
   });
   const deleteAll = api.video.deleteAll.useMutation({
     onSuccess: () => console.log("success"),
   });
-  const a = api.emote.getComments.useQuery({ videoId: videoId });
+
   const checkDupe = api.comment.fetch.useMutation({
     onSuccess: () => console.log("success"),
   });
+
+  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
+
   const x = playerRef.current.clientHeight - 0;
 
   return (
@@ -37,9 +47,15 @@ export const VodParse = ({
     >
       {completed && <ProgressBar videoId={videoId} />}
 
-      <CommentCards playerRef={playerRef} videoId={videoId} player={player} />
-      {/* 
-      <button
+      <CommentCards
+        playerRef={playerRef}
+        cards={cards}
+        setCards={setCards}
+        videoId={videoId}
+        player={player}
+      />
+
+      {/* <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >

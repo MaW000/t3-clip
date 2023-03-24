@@ -1,55 +1,29 @@
 import { api } from "~/utils/api";
-import { useState, useEffect } from "react";
-interface Card {
-  id: string;
-  vidId: string;
-  keyword: string;
-  interval: number;
-  sum: number | null;
-  avg: number | null;
-  max: number | null;
-  min: number | null;
-  url: string | null;
-  timestamps?: Timestamp[] | null;
-}
-interface Timestamp {
-  id: string;
-  timestamp: string;
-  contentOffsetSeconds: number;
-  count: number;
-  cardId: string;
-  vidId: string;
-  msgIds: string[];
-  messages?: Message[] | null;
-}
-type Message = {
-  id: string;
-  vidId: string;
-  cardIds: string[];
-  message: string;
-  commentId: string;
-  commenter: string | null;
-  contentOffsetSeconds: number;
-};
-interface Twitch {
-  seek(time: number): void;
-  current?: {
-    seek(time: number): void;
-  } | null;
-}
+
+import type {
+  Twitch,
+  Card,
+  Timestamp,
+  SetCardsFunction,
+} from "~/types/commentCard";
+
 import Image from "next/image";
 export const CommentCards = ({
   videoId,
   playerRef,
-
+  cards,
+  setCards,
   player,
 }: {
   player: Twitch | null;
   videoId: number;
+  cards: Card[];
+  setCards: SetCardsFunction;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
+      
       const updatedCards =
         cards?.map((card) => {
           if (!data[0]) return { ...card };
@@ -66,7 +40,7 @@ export const CommentCards = ({
   });
   const getCardComments = api.card.getCardComments.useMutation({
     onSuccess: (data) => {
-      const updatedCards =
+      const updatedCards: Card[] =
         cards.map((card) => {
           if (!data[0]) return { ...card };
           if (card.id === data[0].cardId) {
@@ -83,16 +57,7 @@ export const CommentCards = ({
       setCards(updatedCards);
     },
   });
-  const [cards, setCards] = useState<Card[]>([]);
 
-  const { data: queryData } = api.card.getCards.useQuery({
-    videoId: videoId,
-  });
-  useEffect(() => {
-    if (queryData) {
-      setCards(queryData);
-    }
-  }, [queryData]);
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
 
   const handleClearMessages = (card: Card, timestamp: Timestamp) => {
@@ -183,17 +148,16 @@ export const CommentCards = ({
           return (
             <div key={card.id}>
               <button
-                onClick={() =>
-                  setCards((cards) =>
-                    cards.map((c) => {
-                      if (c.id === card.id) {
-                        return { ...c, timestamps: null } as Card;
-                      } else {
-                        return c;
-                      }
-                    })
-                  )
-                }
+                onClick={() => {
+                  const updatedCards = cards.map((c) => {
+                    if (c.id === card.id) {
+                      return { ...c, timestamps: null } as Card;
+                    } else {
+                      return c;
+                    }
+                  });
+                  setCards(updatedCards);
+                }}
                 key={card.id}
                 className="flex w-full grow items-center rounded-lg border-2 border-black bg-slate-900 p-2 py-4"
               >
@@ -279,14 +243,15 @@ export const CommentCards = ({
                       </div>
                     );
                   } else {
-                    console.log(timestamp.messages[0])
+                  
                     return (
                       <div
                         key={timestamp.id}
-                        className="border border-slate-600 mx-2 py-1 text-periwinkle-gray-500"
+                        className="mx-2 border border-slate-600 py-1 text-periwinkle-gray-500"
                       >
-                        <div className="around flex gap-5 justify-center">
-                          <button className="underline text-blue-400"
+                        <div className="around flex justify-center gap-5">
+                          <button
+                            className="text-blue-400 underline"
                             onClick={() =>
                               player?.seek(timestamp.contentOffsetSeconds)
                             }
@@ -294,7 +259,8 @@ export const CommentCards = ({
                             {timestamp.timestamp}
                           </button>
                           <h1 className="text-red-400">{timestamp.count}</h1>
-                          <button className="underline text-blue-400"
+                          <button
+                            className="text-blue-400 underline"
                             onClick={() => handleClearMessages(card, timestamp)}
                           >
                             Hide Messages
@@ -303,8 +269,10 @@ export const CommentCards = ({
                         <div>
                           {timestamp.messages.map((message) => {
                             return (
-                              <div className="flex mx-5" key={message.id}>
-                                <h1 className="mr-1 font-bold">{message.commenter}:</h1>
+                              <div className="mx-5 flex" key={message.id}>
+                                <h1 className="mr-1 font-bold">
+                                  {message.commenter}:
+                                </h1>
                                 <h1>{message.message}</h1>
                               </div>
                             );

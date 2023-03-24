@@ -2,22 +2,37 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import type { Term } from "~/types/emote";
+import type { SetCardsFunction, Card } from "~/types/commentCard";
 export const EmoteCards = ({
   terms,
   videoId,
+  setCards,
+  cards,
 }: {
+  cards: Card[];
+  setCards: SetCardsFunction;
   terms: Term[];
   videoId: number;
 }) => {
   const [updatedTerms, setUpdatedTerms] = useState<Term[]>(terms);
 
   useEffect(() => {
-    if (!terms) return;
+    if (!terms || !cards) return;
     terms.sort((a, b) => b.amount - a.amount);
-    setUpdatedTerms(terms);
-  }, [terms]);
+
+    const filteredTerms = terms.filter((term) =>
+      cards.every((card) => card.keyword !== term.term)
+    );
+    setUpdatedTerms(filteredTerms);
+  }, [terms, cards]);
   const comments = api.comment.getComments.useMutation({
-    onSuccess: () => console.log("success"),
+    onSuccess: (data) => {
+    
+      if (!data) return;
+      const newCards = [...cards, data];
+      // const newCards: Card[] = cards.push(data);
+      setCards(newCards);
+    },
   });
   const handleTermClick = (clickedTerm: Term) => {
     comments.mutate({ videoId, keyword: clickedTerm.term });

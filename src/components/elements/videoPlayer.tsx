@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-
+import type { Card } from "~/types/commentCard";
 import { VodParse, EmoteCarousel } from "@/elements";
 import { api } from "~/utils/api";
 interface TwitchPlayera {
@@ -17,6 +17,12 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
   const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
   const response = videoSaveRes.data;
   const [player, setPlayer] = useState<Twitch | null>(null);
+  const [cards, setCards] = useState<Card[]>([]);
+
+  const { data: queryData } = api.card.getCards.useQuery({
+    videoId: videoId,
+  });
+
   useEffect(() => {
     if (!playerRef.current?.clientWidth) return;
 
@@ -30,17 +36,19 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
     };
 
     const initPlayer = new (window as any).Twitch.Player("player", options);
-    setPlayer(initPlayer);
-    if (player === null && playerRef.current !== null) {
-      // playerRefFunc.current = initPlayer;
-      // setPlayer(new (window as any).Twitch.Player("player", options));
+    if (initPlayer) {
+      setPlayer(initPlayer);
+    }
+    if (queryData) {
+      setCards(queryData);
     }
     return () => {
+      setCards(queryData);
       if (initPlayer !== null) {
         initPlayer.destroy();
       }
     };
-  }, [videoId]);
+  }, [videoId, queryData]);
 
   return (
     <div className="relative">
@@ -52,6 +60,8 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         ></div>
 
         <VodParse
+          cards={cards}
+          setCards={setCards}
           player={player}
           playerRef={playerRef}
           videoId={videoId}
@@ -59,7 +69,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         />
       </div>
       <div>
-        <EmoteCarousel videoId={videoId} />
+        <EmoteCarousel videoId={videoId} setCards={setCards} cards={cards} />
       </div>
     </div>
   );

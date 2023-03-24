@@ -13,7 +13,7 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
       setNum(Math.ceil(data));
     });
     channel.bind("closeVod", (bool: boolean) => {
-      console.log("close");
+      
       setConnectionClosed(bool);
     });
   }, [videoId, num]);

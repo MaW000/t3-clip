@@ -36,6 +36,10 @@ export const commentRouter = createTRPCRouter({
     getComments: publicProcedure
         .input(z.object({ videoId: z.number(), keyword: z.string(), interval: z.number().default(30), }))
         .mutation(async ({ ctx, input }) => {
+
+            function escapeSpecialChars(keyword: string) {
+                return keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            }
             if (!input.videoId) return;
 
             const videoId = await ctx.prisma.video.findUnique({
@@ -43,9 +47,11 @@ export const commentRouter = createTRPCRouter({
                 select: { id: true, channelId: true },
             });
             if (!videoId) return;
+
             const cardCurr = await ctx.prisma.card.findFirst({
                 where: { vidId: videoId.id, keyword: input.keyword, interval: input.interval },
             })
+
             const emoteDb = await ctx.prisma.term.findFirst({
                 where: { term: input.keyword },
                 include: {
@@ -53,21 +59,21 @@ export const commentRouter = createTRPCRouter({
 
                 }
             })
-
+     
             if (cardCurr || !emoteDb) return
 
 
-           
 
-            console.log("fetching messages");
+    
+            const keyword = escapeSpecialChars(input.keyword)
             const video = await ctx.prisma.video.findUnique({
                 where: { id: videoId.id },
                 include: {
                     comments: {
                         where: {
                             message: {
-                                contains: input.keyword,
-                                mode: "insensitive",
+                                contains: keyword,
+
                             }
                         },
                         orderBy: {
@@ -77,13 +83,15 @@ export const commentRouter = createTRPCRouter({
                 },
             });
 
+
+  
             if (video?.comments.length === 0) {
                 // const updatedCarda = await ctx.prisma.term.delete({
                 //     where: {
                 //         id: emoteDb.id,
                 //     },
                 // })
-                console.log('no comments found')
+           
                 return { message: "No comments found" }
             }
             const messages = video?.comments;
@@ -139,17 +147,14 @@ export const commentRouter = createTRPCRouter({
                 } else if (card[card.length - 1]?.timestamp === timeMark) {
 
                     card[card.length - 1]?.msgIds.push(message.id)
-                } else {
-                    console.log('its not working', card[card.length - 1]?.timestamp, timeMark)
-                }
-
+                } 
 
 
 
             }
 
             let updatedCards = card.map((c) => {
-                console.log(c)
+    
                 return {
                     ...c,
                     count: c.msgIds.length,
@@ -158,7 +163,7 @@ export const commentRouter = createTRPCRouter({
 
             if (updatedCards.length === 0) {
                 updatedCards = card.map((c) => {
-                    console.log(c)
+              
                     return {
                         ...c,
                         count: c.msgIds.length,
@@ -179,7 +184,7 @@ export const commentRouter = createTRPCRouter({
             });
             if (!avgCount) return
             if (!avgCount._sum.count || !emoteDb.Emote?.url2 || !avgCount._avg.count || !avgCount._min.count || !avgCount._max.count) return
-
+   
             const a = {
                 sum: avgCount._sum.count,
                 avg: Math.round(avgCount._avg.count),
@@ -187,21 +192,24 @@ export const commentRouter = createTRPCRouter({
                 max: avgCount._max.count,
                 url: emoteDb.Emote.url1
             }
-            console.log(a)
+         
             const updatedCard = await ctx.prisma.card.update({
                 data: a,
                 where: {
                     id: cardId,
                 },
             });
-            const updatedCarda = await ctx.prisma.term.delete({
-                where: {
-                    id: emoteDb.id,
-                },
-            });
-
-            console.log('fished')
-            return cards
+            // const updatedCarda = await ctx.prisma.term.delete({
+            //     where: {
+            //         id: emoteDb.id,
+            //     },
+            // });
+            const finalCard = await ctx.prisma.card.findFirst({
+                where: { id: cardId },
+            })
+       
+         
+            return finalCard
         }),
     fetch: publicProcedure
         .input(z.object({ videoId: z.number() }))
@@ -238,7 +246,7 @@ export const commentRouter = createTRPCRouter({
                 min: avgCount._min.count,
                 max: avgCount._max.count,
             }
-            console.log(a)
+       
 
 
             return topTerms
