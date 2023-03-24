@@ -43,7 +43,9 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
       setCards(queryData);
     }
     return () => {
-      setCards(queryData);
+      if (queryData) {
+        setCards(queryData);
+      }
       if (initPlayer !== null) {
         initPlayer.destroy();
       }
