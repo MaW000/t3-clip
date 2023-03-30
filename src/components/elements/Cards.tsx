@@ -8,6 +8,7 @@ import type {
   Message,
 } from "~/types/commentCard";
 import { useSession } from "next-auth/react";
+
 export const CardEle = ({
   card,
   cards,
@@ -355,11 +356,61 @@ export const Comments = ({ message }: { message: Message }) => {
     </div>
   );
 };
-export const TimestampFilter = ({ message }: { message: Message }) => {
+export const TimestampFilter = ({
+  timestamps,
+  cards,
+  setCards,
+  card,
+}: {
+  card: Card;
+  cards: Card[];
+  setCards: SetCardsFunction;
+  timestamps: Timestamp[];
+}) => {
+  const getTimestamps = api.card.getCard.useMutation({
+    onSuccess: (data) => {
+      console.log(data, "1");
+      const updatedCards =
+        cards?.map((card) => {
+          if (!data[0]) return { ...card };
+          if (card.id === data[0].cardId) {
+            const updatedCard = { ...card };
+            updatedCard.timestamps = data;
+            return updatedCard;
+          } else {
+            return card;
+          }
+        }) ?? null;
+      setCards(updatedCards);
+    },
+  });
+  function sortCardsByCount(count: boolean) {
+    if (count) {
+      const asc = timestamps.sort((a, b) => b.count - a.count);
+      const updatedCards: Card[] = cards.map((card) => {
+        if (card.id === asc[0]?.cardId) {
+          return {
+            ...card,
+            timestamps: asc,
+          };
+        }
+
+        return card;
+      });
+      setCards(updatedCards);
+    } else {
+      getTimestamps.mutate({ cardId: card.id });
+    }
+  }
+
   return (
-    <div className="mx-5 flex" key={message.id}>
-      <button>Count</button>
-      <button>Time</button>
+    <div className=" space-x-44 text-center text-xl  text-blue-400 ">
+      <button className="  underline" onClick={() => sortCardsByCount(true)}>
+        Count
+      </button>
+      <button className=" underline" onClick={() => sortCardsByCount(false)}>
+        Time
+      </button>
     </div>
   );
 };

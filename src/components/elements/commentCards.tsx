@@ -1,5 +1,5 @@
 import type { Twitch, Card, SetCardsFunction } from "~/types/commentCard";
-import { CardEle, Timestamps, Comments } from "./Cards";
+import { CardEle, Timestamps, Comments, TimestampFilter } from "./Cards";
 export const CommentCards = ({
   playerRef,
   cards,
@@ -40,6 +40,12 @@ export const CommentCards = ({
                 setCards={setCards}
               />
               <div className="scrollbar-x max-h-56 overflow-y-scroll rounded-b-xl bg-slate-900">
+                <TimestampFilter
+                  timestamps={card.timestamps}
+                  cards={cards}
+                  setCards={setCards}
+                  card={card}
+                />
                 {card.timestamps?.map((timestamp) => {
                   if (!timestamp.messages) {
                     return (
