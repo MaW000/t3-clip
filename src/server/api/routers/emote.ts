@@ -2,36 +2,7 @@ import { z } from "zod";
 import {
     createTRPCRouter,
     publicProcedure,
-    protectedProcedure,
 } from "~/server/api/trpc";
-interface Emote {
-    _id: string;
-    name: string;
-    type: string;
-    width: number;
-    height: number;
-    gif: boolean;
-    urls: {
-        [key: string]: {
-            "1": string;
-            "2": string;
-            "4": string;
-        };
-    };
-}
-interface EmoteGroup {
-    [key: string]: Emote | null;
-}
-interface Emotes {
-    bttvChannelEmotes: Array<EmoteGroup>;
-    bttvGlobalEmotes: Array<EmoteGroup>;
-    ffzChannelEmotes: Array<EmoteGroup>;
-    ffzGlobalEmotes: Array<EmoteGroup>;
-    twitchGlobalEmotes: Array<EmoteGroup>;
-    sevenTvEmotes: Array<EmoteGroup>;
-    sevenTVGlobalEmotes: Array<EmoteGroup>;
-}
-
 export const emoteRouter = createTRPCRouter({
     getComments: publicProcedure
         .input(

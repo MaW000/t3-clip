@@ -4,33 +4,7 @@ import {
     publicProcedure,
     protectedProcedure,
 } from "~/server/api/trpc";
-interface Emote {
-    _id: string;
-    name: string;
-    type: string;
-    width: number;
-    height: number;
-    gif: boolean;
-    urls: {
-        [key: string]: {
-            "1": string;
-            "2": string;
-            "4": string;
-        };
-    };
-}
-interface EmoteGroup {
-    [key: string]: Emote | null;
-}
-interface Emotes {
-    bttvChannelEmotes: Array<EmoteGroup>;
-    bttvGlobalEmotes: Array<EmoteGroup>;
-    ffzChannelEmotes: Array<EmoteGroup>;
-    ffzGlobalEmotes: Array<EmoteGroup>;
-    twitchGlobalEmotes: Array<EmoteGroup>;
-    sevenTvEmotes: Array<EmoteGroup>;
-    sevenTVGlobalEmotes: Array<EmoteGroup>;
-}
+
 
 export const commentRouter = createTRPCRouter({
     getComments: publicProcedure
@@ -59,12 +33,12 @@ export const commentRouter = createTRPCRouter({
 
                 }
             })
-     
+
             if (cardCurr || !emoteDb) return
 
 
 
-    
+
             const keyword = escapeSpecialChars(input.keyword)
             const video = await ctx.prisma.video.findUnique({
                 where: { id: videoId.id },
@@ -84,14 +58,14 @@ export const commentRouter = createTRPCRouter({
             });
 
 
-  
+
             if (video?.comments.length === 0) {
                 // const updatedCarda = await ctx.prisma.term.delete({
                 //     where: {
                 //         id: emoteDb.id,
                 //     },
                 // })
-           
+
                 return { message: "No comments found" }
             }
             const messages = video?.comments;
@@ -107,6 +81,7 @@ export const commentRouter = createTRPCRouter({
                     vidId: videoId.id,
                     keyword: input.keyword,
                     interval: input.interval,
+                    likes: 0
                 }
             })
             const cardId = newCard.id
@@ -147,31 +122,33 @@ export const commentRouter = createTRPCRouter({
                 } else if (card[card.length - 1]?.timestamp === timeMark) {
 
                     card[card.length - 1]?.msgIds.push(message.id)
-                } 
+                }
 
 
 
             }
 
             let updatedCards = card.map((c) => {
-    
+
                 return {
                     ...c,
                     count: c.msgIds.length,
+                    likes: 0
                 };
             }).filter(c => c.count > 1)
 
             if (updatedCards.length === 0) {
                 updatedCards = card.map((c) => {
-              
+
                     return {
                         ...c,
                         count: c.msgIds.length,
+                        likes: 0
                     };
                 })
 
             }
-            const cards = await ctx.prisma.commentCard.createMany({ data: updatedCards })
+            await ctx.prisma.commentCard.createMany({ data: updatedCards })
             const avgCount = await ctx.prisma.commentCard.aggregate({
                 where: {
 
@@ -184,7 +161,7 @@ export const commentRouter = createTRPCRouter({
             });
             if (!avgCount) return
             if (!avgCount._sum.count || !emoteDb.Emote?.url2 || !avgCount._avg.count || !avgCount._min.count || !avgCount._max.count) return
-   
+
             const a = {
                 sum: avgCount._sum.count,
                 avg: Math.round(avgCount._avg.count),
@@ -192,8 +169,8 @@ export const commentRouter = createTRPCRouter({
                 max: avgCount._max.count,
                 url: emoteDb.Emote.url1
             }
-         
-            const updatedCard = await ctx.prisma.card.update({
+
+            await ctx.prisma.card.update({
                 data: a,
                 where: {
                     id: cardId,
@@ -207,13 +184,13 @@ export const commentRouter = createTRPCRouter({
             const finalCard = await ctx.prisma.card.findFirst({
                 where: { id: cardId },
             })
-       
-         
+
+
             return finalCard
         }),
     fetch: publicProcedure
         .input(z.object({ videoId: z.number() }))
-        .mutation(async ({ ctx, input }) => {
+        .mutation(async ({ ctx, }) => {
 
             const topTerms = await ctx.prisma.term.findMany({
                 where: {
@@ -239,16 +216,6 @@ export const commentRouter = createTRPCRouter({
             });
             if (!avgCount) return
             if (!avgCount._sum.count || !avgCount._avg.count || !avgCount._min.count || !avgCount._max.count) return
-
-            const a = {
-                sum: Math.ceil(avgCount._sum.count),
-                avg: avgCount._avg.count,
-                min: avgCount._min.count,
-                max: avgCount._max.count,
-            }
-       
-
-
             return topTerms
         }),
     getSecretMessage: protectedProcedure.query(() => {

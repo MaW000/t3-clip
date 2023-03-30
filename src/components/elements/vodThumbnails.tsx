@@ -1,16 +1,14 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/utils/api";
 export const VodThumbnails = ({}) => {
-  const [videos, setVideos] = useState([]);
   const router = useRouter();
   const videoArr = api.video.getAll.useQuery().data;
 
   return (
     <div
       className={`mx-auto mt-10 flex gap-4 rounded-lg bg-slate-500 p-2  ${
-        videos ? "" : "hidden"
+        videoArr ? "" : "hidden"
       }`}
     >
       {videoArr &&

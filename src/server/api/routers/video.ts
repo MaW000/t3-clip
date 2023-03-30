@@ -107,7 +107,7 @@ export const videoRouter = createTRPCRouter({
           const uniqueEmoteData = emoteData.filter(emote => !existingEmojiIds.has(emote.emojiId));
           if (uniqueEmoteData.length > 0) {
 
-            const a = await ctx.prisma.emote.createMany({ data: uniqueEmoteData as EmoteCreateManyInput[] })
+            await ctx.prisma.emote.createMany({ data: uniqueEmoteData as EmoteCreateManyInput[] })
 
           } else {
             const { log } = console
@@ -173,6 +173,7 @@ export const videoRouter = createTRPCRouter({
               language: vidInfo.language,
               url: vidInfo.url,
               createdAt: vidInfo.created_at,
+              likes: 0,
             };
 
             const video = await ctx.prisma.video.create({ data: data });
@@ -596,10 +597,10 @@ export const videoRouter = createTRPCRouter({
     }),
   fetch: publicProcedure
     .input(z.object({ videoId: z.number() }))
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, }) => {
 
 
-      const commentCards = await ctx.prisma.commentCard.findMany({
+      await ctx.prisma.commentCard.findMany({
         where: {
           cardId: "6411f36b4c068fec0b6fc0af",
           count: {
