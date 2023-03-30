@@ -68,7 +68,7 @@ export const CommentCards = ({
                           player={player}
                           card={card}
                         />
-                        <div>
+                        <div className="-mt-2 border-t-4 border-slate-800">
                           {timestamp.messages.map((message) => {
                             return (
                               <Comments message={message} key={message.id} />

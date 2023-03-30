@@ -55,7 +55,7 @@ export const CardEle = ({
           handleHideTimestamps();
         }
       }}
-      className="flex w-full grow items-center rounded-lg border-2 border-black bg-slate-900 p-2 py-4"
+      className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-4"
     >
       <div className="relative h-14 w-14">
         {card.url && <Image src={card.url} alt="emote" fill={true} />}
@@ -95,25 +95,29 @@ export const CardEle = ({
       <div className="grid grid-cols-2 ">
         <div className="relative float-right w-16 justify-end">
           <label className="labelCards">Min:</label>
-          <h1 className="justify-end text-right text-3xl text-purple-500">
+          <h1
+            className={`justify-end text-right text-2xl text-purple-500 ${
+              toggle ? "" : ""
+            }`}
+          >
             {card.min}
           </h1>
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Max:</label>
-          <h1 className="justify-end text-right text-3xl text-purple-500">
+          <h1 className="mb-2 justify-end text-right text-2xl text-purple-500">
             {card.max}
           </h1>
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Sum:</label>
-          <h1 className="justify-end text-right text-3xl text-purple-500">
+          <h1 className="mb-2 justify-end text-right text-2xl text-purple-500">
             {card.sum}
           </h1>
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Avg:</label>
-          <h1 className="justify-end text-right text-3xl text-purple-500">
+          <h1 className="justify-end text-right text-2xl text-purple-500">
             {card.avg}
           </h1>
         </div>
@@ -157,7 +161,7 @@ export const Timestamps = ({
     },
   });
   const handleClearMessages = (card: Card, timestamp: Timestamp) => {
-    const updatedCardsf =
+    const updatedCards =
       cards.map((cardx) => {
         if (cardx.id === card.id) {
           const updatedTimestamps = card.timestamps?.map((timestampx) => {
@@ -173,7 +177,7 @@ export const Timestamps = ({
         }
         return cardx;
       }) ?? null;
-    setCards(updatedCardsf);
+    setCards(updatedCards);
   };
   const handleLikes = api.card.likeCard.useMutation({
     onSuccess: (data) => {
@@ -229,14 +233,54 @@ export const Timestamps = ({
   });
   const session = useSession();
   const id = session.data?.user.id;
-  console.log(timestamp.liked, id);
+
   return (
-    <div key={timestamp.id} className=" flex justify-center gap-5 ">
+    <div key={timestamp.id} className={` flex justify-center gap-5  pt-7`}>
+      <div className="relative float-left mr-14 justify-end">
+        <label className="labelCards w-[90%]  pb-7">Timestamp:</label>
+        <button
+          onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
+          className="relative float-left mb-2 justify-start  rounded-b-lg bg-gradient-to-b from-slate-900 to-slate-800 pb-5 text-2xl text-purple-500"
+        >
+          {timestamp.timestamp}
+          {hide ? (
+            <button
+              onClick={() =>
+                getCardComments.mutate({
+                  cardId: card.id,
+                  timestamp: timestamp.timestamp,
+                })
+              }
+              className={`absolute left-0 top-2 w-full text-sm text-periwinkle-gray-500 `}
+            >
+              <br />
+              Show Comments
+            </button>
+          ) : (
+            <button
+              onClick={() => handleClearMessages(card, timestamp)}
+              className="absolute left-0 top-2   w-full text-sm text-periwinkle-gray-500"
+            >
+              <br />
+              Hide Comments
+            </button>
+          )}
+        </button>
+        {/* <div className="absolute bottom-0 mb-3 h-1 w-full rounded-b-lg bg-slate-800  text-periwinkle-gray-500 ">
+          Show Comments
+        </div> */}
+      </div>
+      <div className="relative float-left justify-end">
+        <label className="labelCards mr-10 w-full pb-5">Total:</label>
+        <h1 className="mb-2 justify-start text-left text-2xl text-purple-500">
+          {timestamp.count}
+        </h1>
+      </div>
       {!id ? (
         <button disabled>Likes: {timestamp.likes}</button>
       ) : timestamp.liked.includes(id) ? (
         <button
-          className="text-red-500"
+          className="relative ml-10 text-red-500"
           onClick={() => {
             handleDisLike.mutate({
               cardId: timestamp.id,
@@ -244,11 +288,14 @@ export const Timestamps = ({
             });
           }}
         >
-          Likes:{timestamp.likes}
+          <label className="labelCards mr-10 w-full pb-5">Likes:</label>
+          <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
+            {timestamp.likes}
+          </h1>
         </button>
       ) : (
         <button
-          className="text-blue-500"
+          className="relative ml-10 text-blue-500"
           onClick={() => {
             handleLikes.mutate({
               cardId: timestamp.id,
@@ -256,17 +303,20 @@ export const Timestamps = ({
             });
           }}
         >
-          Likes:{timestamp.likes}
+          <label className="labelCards mr-10 w-full pb-5">Likes:</label>
+          <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
+            {timestamp.likes}
+          </h1>
         </button>
       )}
-      <button
+      {/* <button
         className="text-blue-400 underline"
         onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
       >
         {timestamp.timestamp}
-      </button>
-      <h1 className="text-red-500">{timestamp.count}</h1>
-      {hide ? (
+      </button> */}
+
+      {/* {hide ? (
         <button
           className="text-blue-400 underline"
           onClick={() =>
@@ -285,7 +335,7 @@ export const Timestamps = ({
         >
           Hide Comments
         </button>
-      )}
+      )} */}
     </div>
   );
 };
