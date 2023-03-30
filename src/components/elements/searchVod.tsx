@@ -29,13 +29,13 @@ export const SearchVod = ({ ...props }) => {
           error && "border-b-2 border-b-amber-600"
         }`}
       >
-        <label className="text-xs font-medium text-periwinkle-gray-500">
+        <label className="text-base font-medium text-periwinkle-gray-500">
           TWITCH VOD URL
         </label>
         <input
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://www.twitch.tv/videos/1749256306"
-          className="w-[40rem]"
+          className="w-[40rem] text-lg"
         />
       </div>
       {error && (

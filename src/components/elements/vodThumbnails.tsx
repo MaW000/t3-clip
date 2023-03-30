@@ -45,22 +45,22 @@ export const VodThumbnails = ({}) => {
                   width={"480"}
                   alt="thumbnail"
                 />
-                <h1 className="absolute top-0 right-0 rounded-bl-md bg-teal-900 px-1 text-center font-mono text-xs font-semibold leading-4 text-zinc-300">
+                <h1 className="absolute top-0 right-0 rounded-bl-md bg-teal-900 px-1 text-center font-mono text-lg font-semibold leading-4 text-zinc-300">
                   {video.views}
                 </h1>
-                <h1 className="font- absolute bottom-0 right-0 rounded-tl-md bg-teal-900 px-1 text-center font-sans text-xs font-semibold leading-4 text-zinc-300">
+                <h1 className="font- absolute bottom-0 right-0 rounded-tl-md bg-teal-900 px-1 pb-[1px] text-center font-sans text-lg font-semibold leading-4 text-zinc-300">
                   {video.streamer}
                 </h1>
-                <h1 className="font- absolute bottom-0 left-0 rounded-tl-md bg-teal-900 px-1 text-center font-sans text-xs font-semibold leading-4 text-zinc-300">
+                <h1 className="font- absolute bottom-0 left-0 rounded-tl-md bg-teal-900 px-1 pb-[1px] text-center font-sans text-lg font-semibold leading-4 text-zinc-300">
                   likes:{video.likes}
                 </h1>
                 {video.date && (
-                  <h1 className="absolute top-0 left-0 rounded-br-md bg-teal-900 px-2 text-xs font-semibold text-zinc-300">
+                  <h1 className="absolute top-0 left-0 rounded-br-md bg-teal-900 px-2 text-base font-semibold text-zinc-300">
                     {formattedDate}
                   </h1>
                 )}
               </div>
-              <h1 className="truncate rounded-b-md  bg-slate-900 py-1 pl-1 text-xs font-extrabold text-zinc-300">
+              <h1 className="truncate rounded-b-md  bg-slate-900 py-1 pl-1 text-base font-extrabold text-zinc-300">
                 {video.title}
               </h1>
             </div>

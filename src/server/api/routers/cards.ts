@@ -119,7 +119,7 @@ export const cardRouter = createTRPCRouter({
             id: input.cardId
           },
         })
-        console.log(ogCard)
+        
         const filtered = ogCard?.liked.filter((id) => id !== input.userId)
         const card = await ctx.prisma.commentCard.update({
           where: {

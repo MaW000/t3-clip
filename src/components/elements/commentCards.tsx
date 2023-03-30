@@ -18,7 +18,7 @@ export const CommentCards = ({
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
         if (!card.url) return;
-        console.log(card);
+
         if (!card.timestamps) {
           return (
             <CardEle
@@ -39,7 +39,7 @@ export const CommentCards = ({
                 cards={cards}
                 setCards={setCards}
               />
-              <div className="scrollbar-x max-h-56 overflow-y-scroll bg-slate-900">
+              <div className="scrollbar-x max-h-56 overflow-y-scroll rounded-b-xl bg-slate-900">
                 {card.timestamps?.map((timestamp) => {
                   if (!timestamp.messages) {
                     return (

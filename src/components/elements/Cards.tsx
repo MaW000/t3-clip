@@ -7,7 +7,7 @@ import type {
   Twitch,
   Message,
 } from "~/types/commentCard";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 export const CardEle = ({
   card,
   cards,
@@ -63,7 +63,7 @@ export const CardEle = ({
             src={card.url}
             alt="emote"
             fill={true}
-            className=" object-cover "
+            className="  h-auto  w-full object-cover"
           />
         )}
       </div>
@@ -193,7 +193,7 @@ export const Timestamps = ({
           if (!data) return { ...card };
           if (card.id === data.cardId) {
             const updatedLikes = card.likes++;
-            console.log(card, card.likes, updatedLikes);
+
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
                 timestamp.likes = data.likes;
@@ -219,7 +219,7 @@ export const Timestamps = ({
           if (!data) return { ...card };
           if (card.id === data.cardId) {
             const updatedLikes = card.likes--;
-            console.log(card, card.likes, updatedLikes);
+
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
                 timestamp.likes = data.likes;
@@ -352,6 +352,14 @@ export const Comments = ({ message }: { message: Message }) => {
     <div className="mx-5 flex" key={message.id}>
       <h1 className="mr-1 font-bold">{message.commenter}:</h1>
       <h1>{message.message}</h1>
+    </div>
+  );
+};
+export const TimestampFilter = ({ message }: { message: Message }) => {
+  return (
+    <div className="mx-5 flex" key={message.id}>
+      <button>Count</button>
+      <button>Time</button>
     </div>
   );
 };
