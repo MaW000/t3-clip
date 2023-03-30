@@ -396,11 +396,11 @@ export const TimestampFilter = ({
 
   return (
     <div className=" space-x-20 text-center text-lg  text-blue-400 ">
-      <button className="  underline" onClick={() => sortCardsByCount("asc")}>
-        Count
-      </button>
       <button className=" underline" onClick={() => sortCardsByCount("time")}>
         Time
+      </button>
+      <button className="  underline" onClick={() => sortCardsByCount("asc")}>
+        Count
       </button>
       <button className=" underline" onClick={() => sortCardsByCount("likes")}>
         Likes
