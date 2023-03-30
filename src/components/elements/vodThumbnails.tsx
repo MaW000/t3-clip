@@ -34,7 +34,7 @@ export const VodThumbnails = ({}) => {
             <div
               key={i}
               className={
-                "relative w-80 cursor-pointer rounded-md border-4 border-slate-900 bg-slate-700 p-2 drop-shadow-lg"
+                "relative w-72 cursor-pointer rounded-md border-4 border-slate-900 bg-slate-700 p-2 drop-shadow-lg"
               }
               onClick={() => router.push(`/video/${video.videoId}`)}
             >
