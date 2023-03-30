@@ -22,6 +22,7 @@ export const CommentCards = ({
         if (!card.timestamps) {
           return (
             <CardEle
+              toggle={true}
               key={card.id}
               card={card}
               cards={cards}
@@ -32,6 +33,7 @@ export const CommentCards = ({
           return (
             <div key={card.id}>
               <CardEle
+                toggle={false}
                 key={card.id}
                 card={card}
                 cards={cards}

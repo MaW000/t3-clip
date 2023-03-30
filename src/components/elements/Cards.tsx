@@ -12,7 +12,9 @@ export const CardEle = ({
   card,
   cards,
   setCards,
+  toggle,
 }: {
+  toggle: boolean;
   card: Card;
   cards: Card[];
   setCards: SetCardsFunction;
@@ -33,9 +35,26 @@ export const CardEle = ({
       setCards(updatedCards);
     },
   });
+  const handleHideTimestamps = () => {
+    setCards(
+      cards.map((c) => {
+        if (c.id === card.id) {
+          return { ...c, timestamps: null } as Card;
+        } else {
+          return c;
+        }
+      })
+    );
+  };
   return (
     <button
-      onClick={() => getTimestamps.mutate({ cardId: card.id })}
+      onClick={() => {
+        if (toggle) {
+          getTimestamps.mutate({ cardId: card.id });
+        } else {
+          handleHideTimestamps();
+        }
+      }}
       className="flex w-full grow items-center rounded-lg border-2 border-black bg-slate-900 p-2 py-4"
     >
       <div className="relative h-14 w-14">

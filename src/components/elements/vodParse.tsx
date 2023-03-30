@@ -55,12 +55,12 @@ export const VodParse = ({
         player={player}
       />
 
-      <button
+      {/* <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >
         Delete Comments
-      </button>
+      </button> */}
       {/* <button
         className=" bg-black px-2 text-white"
         onClick={() =>
