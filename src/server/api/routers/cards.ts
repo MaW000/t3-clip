@@ -124,7 +124,8 @@ export const cardRouter = createTRPCRouter({
               decrement: 1
             },
             liked: {
-              push: input.userId
+
+              set: card => card.liked.filter(userId => userId !== input.userId)
             }
           }
         })
@@ -149,6 +150,7 @@ export const cardRouter = createTRPCRouter({
             },
           }
         })
+
         return card
       })
 });

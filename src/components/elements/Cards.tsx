@@ -167,6 +167,7 @@ export const Timestamps = ({
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
                 timestamp.likes = data.likes;
+                timestamp.liked = data.liked;
               }
               return timestamp;
             });
@@ -181,23 +182,64 @@ export const Timestamps = ({
       setCards(updatedCards);
     },
   });
-
+  const handleDisLike = api.card.disLikeCard.useMutation({
+    onSuccess: (data) => {
+      const updatedCards: Card[] =
+        cards.map((card) => {
+          if (!data) return { ...card };
+          if (card.id === data.cardId) {
+            const updatedLikes = card.likes--;
+            console.log(card, card.likes, updatedLikes);
+            const updatedTimestamps = card.timestamps?.map((timestamp) => {
+              if (timestamp.id === data?.id) {
+                timestamp.likes = data.likes;
+                timestamp.liked = data.liked;
+              }
+              return timestamp;
+            });
+            return {
+              ...card,
+              timestamps: updatedTimestamps,
+              likes: card.likes,
+            };
+          }
+          return card;
+        }) ?? null;
+      setCards(updatedCards);
+    },
+  });
   const session = useSession();
   const id = session.data?.user.id;
+  console.log(timestamp.liked, id);
   return (
     <div key={timestamp.id} className=" flex justify-center gap-5 ">
-      <button
-        className="text-red-500"
-        onClick={() => {
-          if (id)
+      {!id ? (
+        <button disabled>Likes: {timestamp.likes}</button>
+      ) : timestamp.liked.includes(id) ? (
+        <button
+          className="text-red-500"
+          onClick={() => {
+            handleDisLike.mutate({
+              cardId: timestamp.id,
+              userId: id,
+            });
+          }}
+        >
+          Likes:{timestamp.likes}
+        </button>
+      ) : (
+        <button
+          className="text-blue-500"
+          onClick={() => {
             handleLikes.mutate({
               cardId: timestamp.id,
               userId: id,
             });
-        }}
-      >
-        likes {timestamp.likes}
-      </button>
+          }}
+        >
+          Likes:{timestamp.likes}
+        </button>
+      )}
       <button
         className="text-blue-400 underline"
         onClick={() => player?.seek(timestamp.contentOffsetSeconds)}

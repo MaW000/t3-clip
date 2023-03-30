@@ -555,48 +555,47 @@ export const videoRouter = createTRPCRouter({
 
 
 
-      const result = await ctx.prisma.msg.deleteMany({
+      await ctx.prisma.msg.deleteMany({
 
       });
+      await ctx.prisma.hashtag.deleteMany({})
 
+      await ctx.prisma.term.deleteMany({})
+      await ctx.prisma.emote.deleteMany({
+
+      });
 
 
       await ctx.prisma.commentCard.deleteMany({});
       await ctx.prisma.card.deleteMany({});
-      await ctx.prisma.term.deleteMany({})
-      await ctx.prisma.hashtag.deleteMany({})
-      await ctx.prisma.emote.deleteMany({
-
-      });
       await ctx.prisma.video.deleteMany({
 
       });
       await ctx.prisma.channel.deleteMany({
 
       });
-      console.log('dog')
       const vidId = video?.id;
 
-      if (vidId) {
+      // if (vidId) {
 
-        await ctx.prisma.msg.deleteMany({
-          where: { vidId: vidId },
-        });
-        await ctx.prisma.commentCard.deleteMany({ where: { vidId: video.id } });
-        await ctx.prisma.card.deleteMany({ where: { vidId: video.id } });
-        await ctx.prisma.term.deleteMany({ where: { channelId: video.channelId } })
-        await ctx.prisma.hashtag.deleteMany({ where: { channelId: video.channelId } })
-        await ctx.prisma.emote.deleteMany({
+      //   await ctx.prisma.msg.deleteMany({
+      //     where: { vidId: vidId },
+      //   });
+      //   await ctx.prisma.commentCard.deleteMany({ where: { vidId: video.id } });
+      //   await ctx.prisma.card.deleteMany({ where: { vidId: video.id } });
+      //   await ctx.prisma.term.deleteMany({ where: { channelId: video.channelId } })
+      //   await ctx.prisma.hashtag.deleteMany({ where: { channelId: video.channelId } })
+      //   await ctx.prisma.emote.deleteMany({
 
-        });
-        await ctx.prisma.video.deleteMany({
-          where: { id: vidId },
-        });
-        await ctx.prisma.channel.deleteMany({
-          where: { id: video.channelId },
-        });
+      //   });
+      //   await ctx.prisma.video.deleteMany({
+      //     where: { id: vidId },
+      //   });
+      //   await ctx.prisma.channel.deleteMany({
+      //     where: { id: video.channelId },
+      //   });
 
-      }
+      // }
       console.log('success')
       return {
         greeting: `Hello ${input.videoId}`,

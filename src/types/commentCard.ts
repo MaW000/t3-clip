@@ -25,6 +25,7 @@ export interface Timestamp {
     cardId: string;
     vidId: string;
     msgIds: string[];
+    liked: string[];
     messages?: Message[] | null;
 }
 export interface Message {
