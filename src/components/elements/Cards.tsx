@@ -356,8 +356,8 @@ export const TimestampFilter = ({
       setCards(updatedCards);
     },
   });
-  function sortCardsByCount(count: boolean) {
-    if (count) {
+  function sortCardsByCount(count: string) {
+    if (count === "asc") {
       const asc = timestamps.sort((a, b) => b.count - a.count);
       const updatedCards: Card[] = cards.map((card) => {
         if (card.id === asc[0]?.cardId) {
@@ -370,18 +370,34 @@ export const TimestampFilter = ({
         return card;
       });
       setCards(updatedCards);
-    } else {
+    } else if (count === "time") {
       getTimestamps.mutate({ cardId: card.id });
+    } else if (count === "likes") {
+      const likes = timestamps.sort((a, b) => b.likes - a.likes);
+      const updatedCards: Card[] = cards.map((card) => {
+        if (card.id === likes[0]?.cardId) {
+          return {
+            ...card,
+            timestamps: likes,
+          };
+        }
+
+        return card;
+      });
+      setCards(updatedCards);
     }
   }
 
   return (
     <div className=" space-x-44 text-center text-xl  text-blue-400 ">
-      <button className="  underline" onClick={() => sortCardsByCount(true)}>
+      <button className="  underline" onClick={() => sortCardsByCount("asc")}>
         Count
       </button>
-      <button className=" underline" onClick={() => sortCardsByCount(false)}>
+      <button className=" underline" onClick={() => sortCardsByCount("time")}>
         Time
+      </button>
+      <button className=" underline" onClick={() => sortCardsByCount("likes")}>
+        Likes
       </button>
     </div>
   );
