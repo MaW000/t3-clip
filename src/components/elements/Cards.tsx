@@ -274,9 +274,6 @@ export const Timestamps = ({
             </button>
           )}
         </button>
-        {/* <div className="absolute bottom-0 mb-3 h-1 w-full rounded-b-lg bg-slate-800  text-periwinkle-gray-500 ">
-          Show Comments
-        </div> */}
       </div>
       <div className="relative float-left justify-end">
         <label className="labelCards mr-10 w-full pb-5">Total:</label>

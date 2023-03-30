@@ -39,7 +39,7 @@ export const CommentCards = ({
                 cards={cards}
                 setCards={setCards}
               />
-              <div className="scrollbar-x max-h-56 overflow-y-scroll rounded-b-xl bg-slate-900">
+              <div className="scrollbar-x max-h-96 overflow-y-scroll rounded-b-xl bg-slate-900">
                 <TimestampFilter
                   timestamps={card.timestamps}
                   cards={cards}
