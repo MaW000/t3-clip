@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Pusher from "pusher-js";
+import Link from "next/link";
 export const ProgressBar = ({ videoId }: { videoId: number }) => {
   const [num, setNum] = useState(0);
   const [connectionClosed, setConnectionClosed] = useState(false);
@@ -13,7 +14,6 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
       setNum(Math.ceil(data));
     });
     channel.bind("closeVod", (bool: boolean) => {
-      
       setConnectionClosed(bool);
     });
   }, [videoId, num]);
@@ -26,6 +26,12 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
               Fetching comments this will take a while refresh in a few
               minutes...
             </h1>
+            <Link
+              className="text-blue-500 underline"
+              href={`https://next-clip.herokuapp.com/video/${videoId}`}
+            >
+              Downloading new videos only works on heroku Click Here to visit!
+            </Link>
           </div>
           <h1>{num}</h1>
           <div style={{ width: `${num}%` }} className={`z-10 h-5  bg-black`} />

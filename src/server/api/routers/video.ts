@@ -553,9 +553,9 @@ export const videoRouter = createTRPCRouter({
       });
 
 
-     
+
       const result = await ctx.prisma.msg.deleteMany({
-        where: { vidId: "64257ed98a3af40c9f4243bd" },
+
       });
 
 
