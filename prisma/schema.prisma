@@ -73,6 +73,7 @@ model Video {
     thumbnail    String
     streamer     String
     views        Int
+    likes        Int
     language     String
     date         String
     createdAt    String
@@ -111,11 +112,12 @@ model Card {
     vidId       String        @db.ObjectId
     keyword     String
     interval    Int
+    likes       Int
     sum         Int?
     avg         Int?
     max         Int?
     min         Int?
-    url        String?
+    url         String?
     CommentCard CommentCard[]
     Video       Video         @relation(fields: [vidId], references: [id])
 }
@@ -125,12 +127,15 @@ model CommentCard {
     timestamp            String
     contentOffsetSeconds Int
     count                Int
+    likes                Int
+    liked                String[] @db.ObjectId
     cardId               String   @db.ObjectId
     vidId                String   @db.ObjectId
     msgIds               String[] @db.ObjectId
     card                 Card     @relation(fields: [cardId], references: [id])
     video                Video    @relation(fields: [vidId], references: [id])
     messages             Msg[]    @relation(fields: [msgIds], references: [id])
+    
 }
 
 model Msg {
