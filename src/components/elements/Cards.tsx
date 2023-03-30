@@ -162,20 +162,26 @@ export const Timestamps = ({
         cards.map((card) => {
           if (!data) return { ...card };
           if (card.id === data.cardId) {
+            const updatedLikes = card.likes++;
+            console.log(card, card.likes, updatedLikes);
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
                 timestamp.likes = data.likes;
               }
               return timestamp;
             });
-            return { ...card, timestamps: updatedTimestamps };
+            return {
+              ...card,
+              timestamps: updatedTimestamps,
+              likes: card.likes,
+            };
           }
           return card;
         }) ?? null;
       setCards(updatedCards);
     },
   });
-  
+
   const session = useSession();
   const id = session.data?.user.id;
   return (

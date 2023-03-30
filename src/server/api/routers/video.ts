@@ -540,6 +540,7 @@ export const videoRouter = createTRPCRouter({
           language: true,
           videoId: true,
           date: true,
+          likes: true,
         },
       });
     }),

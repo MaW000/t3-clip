@@ -71,8 +71,8 @@ export const cardRouter = createTRPCRouter({
     })
   )
     .mutation(async ({ ctx, input }) => {
-      
-      return await ctx.prisma.commentCard.update({
+
+      const card = await ctx.prisma.commentCard.update({
         where: {
           id: input.cardId
         },
@@ -85,5 +85,70 @@ export const cardRouter = createTRPCRouter({
           }
         }
       })
-    })
+
+      await ctx.prisma.video.update({
+        where: {
+          id: card.vidId
+        },
+        data: {
+          likes: {
+            increment: 1
+          },
+        }
+      })
+      await ctx.prisma.card.update({
+        where: {
+          id: card.cardId
+        },
+        data: {
+          likes: {
+            increment: 1
+          },
+        }
+      })
+      return card
+    }), disLikeCard: protectedProcedure.input(
+      z.object({
+        cardId: z.string(),
+        userId: z.string()
+      })
+    )
+      .mutation(async ({ ctx, input }) => {
+
+        const card = await ctx.prisma.commentCard.update({
+          where: {
+            id: input.cardId
+          },
+          data: {
+            likes: {
+              decrement: 1
+            },
+            liked: {
+              push: input.userId
+            }
+          }
+        })
+
+        await ctx.prisma.video.update({
+          where: {
+            id: card.vidId
+          },
+          data: {
+            likes: {
+              decrement: 1
+            },
+          }
+        })
+        await ctx.prisma.card.update({
+          where: {
+            id: card.cardId
+          },
+          data: {
+            likes: {
+              decrement: 1
+            },
+          }
+        })
+        return card
+      })
 });
