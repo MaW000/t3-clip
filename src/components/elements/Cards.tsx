@@ -58,7 +58,14 @@ export const CardEle = ({
       className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-4"
     >
       <div className="relative h-14 w-14">
-        {card.url && <Image src={card.url} alt="emote" fill={true} />}
+        {card.url && (
+          <Image
+            src={card.url}
+            alt="emote"
+            fill={true}
+            className=" object-cover "
+          />
+        )}
       </div>
       <div className="ml-auto mr-5 flex">
         <div className="relative mr-20  h-10 w-20">
