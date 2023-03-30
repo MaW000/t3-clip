@@ -67,18 +67,22 @@ export const cardRouter = createTRPCRouter({
   likeCard: protectedProcedure.input(
     z.object({
       cardId: z.string(),
-      timestamp: z.string()
+      userId: z.string()
     })
   )
     .mutation(async ({ ctx, input }) => {
-
-      return await ctx.prisma.commentCard.findMany({
+      
+      return await ctx.prisma.commentCard.update({
         where: {
-          cardId: input.cardId,
-          timestamp: input.timestamp
+          id: input.cardId
         },
-        include: {
-          messages: true
+        data: {
+          likes: {
+            increment: 1
+          },
+          liked: {
+            push: input.userId
+          }
         }
       })
     })

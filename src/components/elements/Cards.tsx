@@ -7,6 +7,7 @@ import type {
   Twitch,
   Message,
 } from "~/types/commentCard";
+import { signIn, signOut, useSession } from "next-auth/react";
 export const CardEle = ({
   card,
   cards,
@@ -41,6 +42,17 @@ export const CardEle = ({
         {card.url && <Image src={card.url} alt="emote" fill={true} />}
       </div>
       <div className="ml-auto mr-5 flex">
+        <div className="relative mr-20  h-10 w-20">
+          <label className="labelCardsH">Likes</label>
+          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
+          <h1
+            className={`float-right content-center  font-bold  text-purple-500 ${
+              card.keyword.length > 20 ? "text-xl" : "text-2xl"
+            }`}
+          >
+            {card.likes}
+          </h1>
+        </div>
         <div className="relative ml-auto  h-10 w-20">
           <label className="labelCardsH">Keyword</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
@@ -144,8 +156,42 @@ export const Timestamps = ({
       }) ?? null;
     setCards(updatedCardsf);
   };
+  const handleLikes = api.card.likeCard.useMutation({
+    onSuccess: (data) => {
+      const updatedCards: Card[] =
+        cards.map((card) => {
+          if (!data) return { ...card };
+          if (card.id === data.cardId) {
+            const updatedTimestamps = card.timestamps?.map((timestamp) => {
+              if (timestamp.id === data?.id) {
+                timestamp.likes = data.likes;
+              }
+              return timestamp;
+            });
+            return { ...card, timestamps: updatedTimestamps };
+          }
+          return card;
+        }) ?? null;
+      setCards(updatedCards);
+    },
+  });
+  
+  const session = useSession();
+  const id = session.data?.user.id;
   return (
     <div key={timestamp.id} className=" flex justify-center gap-5 ">
+      <button
+        className="text-red-500"
+        onClick={() => {
+          if (id)
+            handleLikes.mutate({
+              cardId: timestamp.id,
+              userId: id,
+            });
+        }}
+      >
+        likes {timestamp.likes}
+      </button>
       <button
         className="text-blue-400 underline"
         onClick={() => player?.seek(timestamp.contentOffsetSeconds)}

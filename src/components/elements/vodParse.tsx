@@ -25,16 +25,16 @@ export const VodParse = ({
   completed: boolean | undefined;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  const getComments = api.comment.getComments.useMutation({
-    onSuccess: () => console.log("success"),
-  });
+  // const getComments = api.comment.getComments.useMutation({
+  //   onSuccess: () => console.log("success"),
+  // });
   const deleteAll = api.video.deleteAll.useMutation({
     onSuccess: () => console.log("success"),
   });
 
-  const checkDupe = api.comment.fetch.useMutation({
-    onSuccess: () => console.log("success"),
-  });
+  // const checkDupe = api.comment.fetch.useMutation({
+  //   onSuccess: () => console.log("success"),
+  // });
 
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
 
@@ -55,13 +55,13 @@ export const VodParse = ({
         player={player}
       />
 
-      {/* <button
+      <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >
         Delete Comments
       </button>
-      <button
+      {/* <button
         className=" bg-black px-2 text-white"
         onClick={() =>
           getComments.mutate({ videoId: videoId, keyword: "lul", interval: 5 })

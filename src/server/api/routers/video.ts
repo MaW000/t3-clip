@@ -551,9 +551,15 @@ export const videoRouter = createTRPCRouter({
         where: { videoId: input.videoId },
         select: { id: true, channelId: true },
       });
-      await ctx.prisma.msg.deleteMany({
 
+
+     
+      const result = await ctx.prisma.msg.deleteMany({
+        where: { vidId: "64257ed98a3af40c9f4243bd" },
       });
+
+
+
       await ctx.prisma.commentCard.deleteMany({});
       await ctx.prisma.card.deleteMany({});
       await ctx.prisma.term.deleteMany({})
@@ -567,7 +573,7 @@ export const videoRouter = createTRPCRouter({
       await ctx.prisma.channel.deleteMany({
 
       });
-
+      console.log('dog')
       const vidId = video?.id;
 
       if (vidId) {
@@ -590,7 +596,7 @@ export const videoRouter = createTRPCRouter({
         });
 
       }
-
+      console.log('success')
       return {
         greeting: `Hello ${input.videoId}`,
       };

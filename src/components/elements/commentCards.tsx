@@ -18,7 +18,7 @@ export const CommentCards = ({
     <div className="my-2 mr-2 flex flex-col gap-2 ">
       {cards?.map((card: Card) => {
         if (!card.url) return;
-
+        console.log(card);
         if (!card.timestamps) {
           return (
             <CardEle

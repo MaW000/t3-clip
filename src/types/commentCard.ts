@@ -13,11 +13,13 @@ export interface Card {
     max: number | null;
     min: number | null;
     url: string | null;
+    likes: number;
     timestamps?: Timestamp[] | null;
 }
 export interface Timestamp {
     id: string;
     timestamp: string;
+    likes: number;
     contentOffsetSeconds: number;
     count: number;
     cardId: string;

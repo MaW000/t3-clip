@@ -8,7 +8,7 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
   const { data: sessionData } = useSession();
 
   const { data: secretMessage } = api.video.getSecretMessage.useQuery(
-    undefined, // no input
+    undefined,
     { enabled: sessionData?.user !== undefined }
   );
   const [url, setUrl] = useState("");
