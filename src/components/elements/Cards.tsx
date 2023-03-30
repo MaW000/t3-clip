@@ -282,7 +282,13 @@ export const Timestamps = ({
         </h1>
       </div>
       {!id ? (
-        <button disabled>Likes: {timestamp.likes}</button>
+        <button className="relative ml-10 text-red-500" disabled>
+          {" "}
+          <label className="labelCards mr-10 w-full pb-5 text-sm">Likes:</label>
+          <h1 className="mb-5 justify-start text-left text-lg text-purple-500">
+            {timestamp.likes}
+          </h1>
+        </button>
       ) : timestamp.liked.includes(id) ? (
         <button
           className="relative ml-10 text-red-500"
