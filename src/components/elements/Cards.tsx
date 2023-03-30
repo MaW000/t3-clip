@@ -56,19 +56,19 @@ export const CardEle = ({
           handleHideTimestamps();
         }
       }}
-      className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-4"
+      className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-3"
     >
-      <div className="relative h-14 w-14">
+      <div className="relative mb-5 h-10 w-14">
         {card.url && (
           <Image
             src={card.url}
             alt="emote"
             fill={true}
-            className="  h-auto  w-full object-cover"
+            className="  h-auto w-full object-cover"
           />
         )}
       </div>
-      <div className="ml-auto mr-5 flex">
+      <div className="ml-auto mr-5 mb-3 flex">
         <div className="relative mr-20  h-10 w-20">
           <label className="labelCardsH">Likes</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
@@ -85,7 +85,7 @@ export const CardEle = ({
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
             className={`float-right content-center  font-bold  text-purple-500 ${
-              card.keyword.length > 20 ? "text-xl" : "text-2xl"
+              card.keyword.length > 20 ? "text-xl" : "text-xl"
             }`}
           >
             {card.keyword}
@@ -100,11 +100,11 @@ export const CardEle = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 ">
+      <div className="mr-5 grid grid-cols-2">
         <div className="relative float-right w-16 justify-end">
           <label className="labelCards">Min:</label>
           <h1
-            className={`justify-end text-right text-2xl text-purple-500 ${
+            className={`justify-end text-right text-xl text-purple-500 ${
               toggle ? "" : ""
             }`}
           >
@@ -113,19 +113,19 @@ export const CardEle = ({
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Max:</label>
-          <h1 className="mb-2 justify-end text-right text-2xl text-purple-500">
+          <h1 className="mb-2 justify-end text-right text-xl text-purple-500">
             {card.max}
           </h1>
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Sum:</label>
-          <h1 className="mb-2 justify-end text-right text-2xl text-purple-500">
+          <h1 className="mb-2 justify-end text-right text-xl text-purple-500">
             {card.sum}
           </h1>
         </div>
         <div className="relative float-right  w-16 justify-end">
           <label className="labelCards">Avg:</label>
-          <h1 className="justify-end text-right text-2xl text-purple-500">
+          <h1 className="justify-end text-right text-xl text-purple-500">
             {card.avg}
           </h1>
         </div>
@@ -245,12 +245,13 @@ export const Timestamps = ({
   return (
     <div key={timestamp.id} className={` flex justify-center gap-5  pt-7`}>
       <div className="relative float-left mr-14 justify-end">
-        <label className="labelCards w-[90%]  pb-7">Timestamp:</label>
+        <label className="labelCards w-[90%] pb-5  text-sm">Timestamp:</label>
         <button
           onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
-          className="relative float-left mb-2 justify-start  rounded-b-lg bg-gradient-to-b from-slate-900 to-slate-800 pb-5 text-2xl text-purple-500"
+          className="relative float-left mb-2 justify-start  rounded-b-lg bg-gradient-to-b from-slate-900 to-slate-800 pb-3 text-lg text-purple-500"
         >
           {timestamp.timestamp}
+          <br />
           {hide ? (
             <button
               onClick={() =>
@@ -259,15 +260,14 @@ export const Timestamps = ({
                   timestamp: timestamp.timestamp,
                 })
               }
-              className={`absolute left-0 top-2 w-full text-sm text-periwinkle-gray-500 `}
+              className={`absolute left-0 bottom-0 w-full text-xs text-periwinkle-gray-500 `}
             >
-              <br />
               Show Comments
             </button>
           ) : (
             <button
               onClick={() => handleClearMessages(card, timestamp)}
-              className="absolute left-0 top-2   w-full text-sm text-periwinkle-gray-500"
+              className="absolute left-0 top-1   w-full text-sm text-periwinkle-gray-500"
             >
               <br />
               Hide Comments
@@ -276,8 +276,8 @@ export const Timestamps = ({
         </button>
       </div>
       <div className="relative float-left justify-end">
-        <label className="labelCards mr-10 w-full pb-5">Total:</label>
-        <h1 className="mb-2 justify-start text-left text-2xl text-purple-500">
+        <label className="labelCards mr-10 w-full pb-5 text-sm">Total:</label>
+        <h1 className="mb-2 justify-start text-left text-lg text-purple-500">
           {timestamp.count}
         </h1>
       </div>
@@ -293,11 +293,11 @@ export const Timestamps = ({
             });
           }}
         >
-          <label className="labelCards mr-10 w-full pb-5">Likes:</label>
-          <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
+          <label className="labelCards mr-10 w-full pb-5 text-sm">Likes:</label>
+          <h1 className="mb-5 justify-start text-left text-lg text-purple-500">
             {timestamp.likes}
           </h1>
-          <AiFillHeart className="absolute -top-2 -right-5 text-lg" />
+          <AiFillHeart className="absolute -top-5 -right-5 text-lg" />
         </button>
       ) : (
         <button
@@ -309,11 +309,11 @@ export const Timestamps = ({
             });
           }}
         >
-          <label className="labelCards mr-10 w-full pb-5">Likes:</label>
-          <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
+          <label className="labelCards mr-10 w-full pb-5 text-sm">Likes:</label>
+          <h1 className="mb-5 justify-start text-left text-xl text-purple-500">
             {timestamp.likes}
           </h1>
-          <AiOutlineHeart className="absolute -top-2 -right-5 text-lg" />
+          <AiOutlineHeart className="absolute -top-5 -right-5 text-lg" />
         </button>
       )}
     </div>
@@ -322,7 +322,7 @@ export const Timestamps = ({
 
 export const Comments = ({ message }: { message: Message }) => {
   return (
-    <div className="mx-5 flex" key={message.id}>
+    <div className="mx-5 flex text-xs" key={message.id}>
       <h1 className="mr-1 font-bold">{message.commenter}:</h1>
       <h1>{message.message}</h1>
     </div>
@@ -389,7 +389,7 @@ export const TimestampFilter = ({
   }
 
   return (
-    <div className=" space-x-44 text-center text-xl  text-blue-400 ">
+    <div className=" space-x-20 text-center text-xl  text-blue-400 ">
       <button className="  underline" onClick={() => sortCardsByCount("asc")}>
         Count
       </button>
