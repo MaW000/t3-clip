@@ -8,7 +8,7 @@ import type {
   Message,
 } from "~/types/commentCard";
 import { useSession } from "next-auth/react";
-
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 export const CardEle = ({
   card,
   cards,
@@ -300,6 +300,7 @@ export const Timestamps = ({
           <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
             {timestamp.likes}
           </h1>
+          <AiFillHeart className="absolute -top-2 -right-5 text-lg" />
         </button>
       ) : (
         <button
@@ -315,35 +316,9 @@ export const Timestamps = ({
           <h1 className="mb-5 justify-start text-left text-2xl text-purple-500">
             {timestamp.likes}
           </h1>
+          <AiOutlineHeart className="absolute -top-2 -right-5 text-lg" />
         </button>
       )}
-      {/* <button
-        className="text-blue-400 underline"
-        onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
-      >
-        {timestamp.timestamp}
-      </button> */}
-
-      {/* {hide ? (
-        <button
-          className="text-blue-400 underline"
-          onClick={() =>
-            getCardComments.mutate({
-              cardId: card.id,
-              timestamp: timestamp.timestamp,
-            })
-          }
-        >
-          Show Comments
-        </button>
-      ) : (
-        <button
-          className="text-blue-400 underline"
-          onClick={() => handleClearMessages(card, timestamp)}
-        >
-          Hide Comments
-        </button>
-      )} */}
     </div>
   );
 };

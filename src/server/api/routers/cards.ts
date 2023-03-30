@@ -71,7 +71,12 @@ export const cardRouter = createTRPCRouter({
     })
   )
     .mutation(async ({ ctx, input }) => {
-
+      const test = await ctx.prisma.commentCard.findUnique({
+        where: {
+          id: input.cardId
+        }
+      })
+      if (test?.liked.includes(input.userId)) return
       const card = await ctx.prisma.commentCard.update({
         where: {
           id: input.cardId
@@ -119,7 +124,7 @@ export const cardRouter = createTRPCRouter({
             id: input.cardId
           },
         })
-        
+        if (!ogCard?.liked.includes(input.userId)) return
         const filtered = ogCard?.liked.filter((id) => id !== input.userId)
         const card = await ctx.prisma.commentCard.update({
           where: {
