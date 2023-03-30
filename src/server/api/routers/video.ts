@@ -542,6 +542,10 @@ export const videoRouter = createTRPCRouter({
           date: true,
           likes: true,
         },
+        orderBy: {
+          likes: 'desc'
+        },
+        take: 5
       });
     }),
 
