@@ -191,7 +191,7 @@ export const Timestamps = ({
         cards.map((card) => {
           if (!data) return { ...card };
           if (card.id === data.cardId) {
-            const updatedLikes = card.likes++;
+         
 
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
@@ -217,7 +217,7 @@ export const Timestamps = ({
         cards.map((card) => {
           if (!data) return { ...card };
           if (card.id === data.cardId) {
-            const updatedLikes = card.likes--;
+       
 
             const updatedTimestamps = card.timestamps?.map((timestamp) => {
               if (timestamp.id === data?.id) {
@@ -250,27 +250,7 @@ export const Timestamps = ({
         >
           {timestamp.timestamp}
           <br />
-          {/* {hide ? (
-            <button
-              onClick={() =>
-                getCardComments.mutate({
-                  cardId: card.id,
-                  timestamp: timestamp.timestamp,
-                })
-              }
-              className={`absolute left-0 bottom-0 w-full text-xs text-periwinkle-gray-500 `}
-            >
-              Show Comments
-            </button>
-          ) : (
-            <button
-              onClick={() => handleClearMessages(card, timestamp)}
-              className="absolute left-0 top-1   w-full text-sm text-periwinkle-gray-500"
-            >
-              <br />
-              Hide Comments
-            </button>
-          )} */}
+
         </button>
       </div>
       <div className="relative float-left justify-end">
@@ -320,12 +300,27 @@ export const Timestamps = ({
           <AiOutlineHeart className="absolute -top-5 -right-2 text-lg" />
         </button>
       )}
+           {hide ? (
+       
                 <button
-              onClick={() => handleClearMessages(card, timestamp)}
-              className="absolute   text-[.8rem] mb-10 top-3 right-2 bg-slate-800 rounded-r-xl p-1 font-bold text-slate-700 leading-none "
-            >
-            M<br />S<br />G<br />S 
-            </button>
+                onClick={() =>
+                  getCardComments.mutate({
+                    cardId: card.id,
+                    timestamp: timestamp.timestamp,
+                  })}
+                className="absolute   text-[.8rem] mb-10 top-3 right-2 bg-slate-800 rounded-r-xl p-1 font-bold text-black leading-none "
+              >
+              M<br />S<br />G<br />S 
+              </button>
+          ) : (
+            <button
+            onClick={() => handleClearMessages(card, timestamp)}
+            className="absolute   text-[.8rem] mb-10 top-3 right-2 bg-slate-800 rounded-r-xl p-1 font-bold text-black leading-none "
+          >
+          M<br />S<br />G<br />S 
+          </button>
+          )}
+          
     </div>
   );
 };

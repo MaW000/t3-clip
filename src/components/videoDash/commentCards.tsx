@@ -63,7 +63,7 @@ export const CommentCards = ({
                     return (
                       <div
                         key={timestamp.id}
-                        className="mx-2 border border-slate-600 py-1 text-periwinkle-gray-500"
+                        className=" border border-slate-600 py-1 text-periwinkle-gray-500"
                       >
                         <Timestamps
                           hide={false}
