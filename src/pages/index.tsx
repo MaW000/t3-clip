@@ -1,4 +1,4 @@
-import { type NextPage } from "next";
+import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 import {
   SearchVod,
@@ -28,7 +28,7 @@ const Home: NextPage = () => {
       </h1>
     </div>
           <div className="mt-12 flex">
-            <VodThumbnails />
+            <VodThumbnails  />
           </div>
           <p className="text-md mt-10 px-5 text-center font-medium text-white md:text-lg lg:text-2xl">
             Paste in a <span className="text-purple-400">Twitch VOD</span> and
@@ -43,5 +43,26 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import { appRouter } from "~/server/api/root";
+import superjson from "superjson";
+import {prisma } from '~/server/db'
+export const getStaticProps: GetStaticProps = async () => {
+  
+  const ssg = createProxySSGHelpers({
+    router: appRouter,
+    ctx: {prisma, session: null},
+    transformer: superjson, 
+  });
+
+  await ssg.video.getAll.prefetch()
+
+  return {
+    props:{
+      trpcState:ssg.dehydrate()
+    }
+  }
+}
 
 export default Home;
