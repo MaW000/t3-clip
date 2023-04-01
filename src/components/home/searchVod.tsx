@@ -18,6 +18,7 @@ export const SearchVod = ({ ...props }) => {
   }
 
   return (
+
     <div
       className={
         " mt-3 ml-5  flex flex-col justify-center md:ml-7 lg:ml-0 lg:flex-row lg:space-x-5"
@@ -47,14 +48,14 @@ export const SearchVod = ({ ...props }) => {
         </div>
       )}
       <div className={"mt-2 flex flex-row gap-3 lg:mt-0"}>
-        {/* <Link href={`/videos/${url}`}> */}
+     
         <button
-          className="relative mt-3 inline-flex justify-center overflow-hidden rounded-lg bg-purple-400 py-2 px-3 text-sm font-semibold text-black outline-2 outline-offset-2 transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-purple-600 active:text-white/80 active:before:bg-transparent"
+          className="relative mt-5 inline-flex justify-center overflow-hidden rounded-lg bg-purple-400 py-2 px-3 text-sm font-semibold text-black outline-2 outline-offset-2 transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-purple-600 active:text-white/80 active:before:bg-transparent"
           onClick={handleUrl}
         >
           Submit
         </button>
-        {/* </Link> */}
+      
       </div>
     </div>
   );

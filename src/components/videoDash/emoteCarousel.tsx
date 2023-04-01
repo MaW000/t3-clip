@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { EmoteCards } from "@/elements";
+import { EmoteCards } from "~/components";
 import type { Term } from "~/types/emote";
 import type { SetCardsFunction, Card } from "~/types/commentCard";
 export const EmoteCarousel = ({

@@ -1,16 +1,15 @@
 import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from "~/utils/api";
-import { HeaderSearch } from "@/elements";
+// import { api } from "~/utils/api";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
   const { data: sessionData } = useSession();
 
-  const { data: secretMessage } = api.video.getSecretMessage.useQuery(
-    undefined,
-    { enabled: sessionData?.user !== undefined }
-  );
+  // const { data: secretMessage } = api.video.getSecretMessage.useQuery(
+  //   undefined,
+  //   { enabled: sessionData?.user !== undefined }
+  // );
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
@@ -25,6 +24,7 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
   }
   return (
     <header className=" grid grid-cols-12 py-5">
+      {/* search bar that shows on pages other than main */}
       <div
         className={`col-span-9 col-start-1 row-span-full ${
           toggleSearch ? "" : "hidden"
@@ -50,6 +50,8 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
           <div className="pointer-events-none absolute bottom-2 left-1/2 h-1 w-1/2 -translate-x-1/2 transform bg-white opacity-0 group-hover:opacity-100 group-hover:duration-500" />
         </button>
       </div>
+      {/* login bar */}
+      {error && <h1>{error}</h1>}
       <div className=" col-end-13    ">
         <button
           className="mr-0 -ml-2  rounded-full  bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"

@@ -74,7 +74,7 @@ export const CardEle = ({
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
             className={`float-right content-center  font-bold  text-purple-500 ${
-              card.keyword.length > 20 ? "text-xl" : "text-2xl"
+              card.keyword.length > 20 ? "text-xl" : "text-xl"
             }`}
           >
             {card.likes}
@@ -94,19 +94,17 @@ export const CardEle = ({
         <div className="relative ml-7 h-10 w-10">
           <label className="labelCardsH">Interval</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
-          <h1 className="  content-center justify-center align-middle text-2xl font-bold text-purple-500">
+          <h1 className="  content-center justify-center align-middle text-xl font-bold text-purple-500">
             {card.interval}s
           </h1>
         </div>
       </div>
 
-      <div className="mr-5 grid grid-cols-2">
+      <div className="mr-5 grid grid-cols-2 -mb-5">
         <div className="relative float-right w-16 justify-end">
           <label className="labelCards">Min:</label>
           <h1
-            className={`justify-end text-right text-xl text-purple-500 ${
-              toggle ? "" : ""
-            }`}
+            className={`justify-end text-right text-xl text-purple-500 `}
           >
             {card.min}
           </h1>
@@ -243,16 +241,16 @@ export const Timestamps = ({
   const id = session.data?.user.id;
 
   return (
-    <div key={timestamp.id} className={` flex justify-center gap-5  pt-7`}>
+    <div key={timestamp.id} className={`relative flex justify-center gap-5 pt-7`}>
       <div className="relative float-left mr-14 justify-end">
         <label className="labelCards w-[90%] pb-5  text-sm">Timestamp:</label>
         <button
           onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
-          className="relative float-left mb-2 justify-start  rounded-b-lg bg-gradient-to-b from-slate-900 to-slate-800 pb-3 text-lg text-purple-500"
+          className="relative float-left mb-2 justify-start  rounded-b-lg   text-lg text-purple-500"
         >
           {timestamp.timestamp}
           <br />
-          {hide ? (
+          {/* {hide ? (
             <button
               onClick={() =>
                 getCardComments.mutate({
@@ -272,7 +270,7 @@ export const Timestamps = ({
               <br />
               Hide Comments
             </button>
-          )}
+          )} */}
         </button>
       </div>
       <div className="relative float-left justify-end">
@@ -303,7 +301,7 @@ export const Timestamps = ({
           <h1 className="mb-5 justify-start text-left text-lg text-purple-500">
             {timestamp.likes}
           </h1>
-          <AiFillHeart className="absolute -top-5 -right-5 text-lg" />
+          <AiFillHeart className="absolute -top-5 -right-2 text-lg" />
         </button>
       ) : (
         <button
@@ -319,9 +317,15 @@ export const Timestamps = ({
           <h1 className="mb-5 justify-start text-left text-xl text-purple-500">
             {timestamp.likes}
           </h1>
-          <AiOutlineHeart className="absolute -top-5 -right-5 text-lg" />
+          <AiOutlineHeart className="absolute -top-5 -right-2 text-lg" />
         </button>
       )}
+                <button
+              onClick={() => handleClearMessages(card, timestamp)}
+              className="absolute   text-[.8rem] mb-10 top-3 right-2 bg-slate-800 rounded-r-xl p-1 font-bold text-slate-700 leading-none "
+            >
+            M<br />S<br />G<br />S 
+            </button>
     </div>
   );
 };

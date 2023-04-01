@@ -1,10 +1,10 @@
 import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { VideoDash, HeaderMain } from "~/components/elements";
-
+import { VideoDash, HeaderMain } from "~/components";
 import { useState } from "react";
 import Script from "next/script";
 import Head from "next/head";
+
 const VideoPage: NextPage = () => {
   const [toggle, setToggle] = useState(false);
   const router = useRouter();

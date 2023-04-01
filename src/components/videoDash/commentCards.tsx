@@ -12,7 +12,7 @@ export const CommentCards = ({
   setCards: SetCardsFunction;
   playerRef: React.RefObject<HTMLDivElement>;
 }) => {
-  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
+  if (!playerRef.current?.clientWidth) return <h1>Loading...</h1>;
 
   return (
     <div className="my-2 mr-2 flex flex-col gap-2 ">

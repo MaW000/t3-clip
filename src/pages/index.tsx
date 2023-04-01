@@ -1,13 +1,11 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from "~/utils/api";
 import {
   SearchVod,
   VodThumbnails,
   HeaderMain,
-  TitleDescription,
-} from "@/elements";
+ 
+} from "~/components";
 
 const Home: NextPage = () => {
   return (
@@ -21,7 +19,14 @@ const Home: NextPage = () => {
       <main className="max-h-screen min-h-screen">
         <HeaderMain toggleSearch={false} />
         <div className="">
-          <TitleDescription />
+        <div className=" flex select-none flex-col items-center  ">
+      <h1
+       
+        className="text-6xl font-semibold text-purple-400 hover:cursor-pointer md:text-9xl"
+      >
+        <span className="text-periwinkle-gray-500">Next</span>.Clip
+      </h1>
+    </div>
           <div className="mt-12 flex">
             <VodThumbnails />
           </div>
