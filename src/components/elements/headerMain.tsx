@@ -1,6 +1,7 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 // import { api } from "~/utils/api";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
@@ -22,13 +23,14 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
       router.push(`/video/${matches[0]}`);
     }
   }
+  const name = sessionData?.user?.name?.split(' ')
   return (
     <header className=" grid grid-cols-12 py-5">
       {/* search bar that shows on pages other than main */}
       <div
         className={`col-span-9 col-start-1 row-span-full ${
           toggleSearch ? "" : "hidden"
-        }  ml-5`}
+        }  ml-5 mr-5`}
       >
         <Link
           href="/"
@@ -52,14 +54,32 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
       </div>
       {/* login bar */}
       {error && <h1>{error}</h1>}
-      <div className=" col-end-13    ">
-        <button
-          className="mr-0 -ml-2  rounded-full  bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-          onClick={sessionData ? () => void signOut() : () => void signIn()}
-        >
-          {sessionData ? "Sign out" : "Sign in"}
-        </button>
-      </div>
+      {!sessionData ? (
+        <div className=" col-end-13    ">
+          <button
+            className="mr-0 -ml-2  rounded-full  bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+            onClick={() => void signIn()}
+          >
+           Sign In
+          </button>
+        </div>
+      ) : (
+        <div className="col-start-10 -ml-11 col-end-13 rounded-lg mr-10 flex bg-gray-500 justify-end  ">
+          <button
+            className="  px-10 py-3  font-semibold text-white no-underline transition "
+            onClick={() => void signIn()}
+            >
+          Sign Out
+          </button>
+          <Link href="/browse" className="py-3 px-10 font-semibold text-white no-underline transition ">
+            Browse
+          </Link>
+          {name && name[0] && <h1 className="py-3 px-5">{name[0]}</h1>}
+            <div >
+              {sessionData.user.image && <Image className="rounded-r-lg" src={sessionData.user.image} alt="Profile Pic" height={50} width={50} />}
+            </div>
+        </div>
+      )}
     </header>
   );
 };

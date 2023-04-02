@@ -20,6 +20,7 @@ export const videoRouter = createTRPCRouter({
         where: { videoId: input.videoId },
         select: { complete: true, streamer: true },
       });
+      
       //if video does not exist we start fetching data but instantly return video is fetching to update ui.
       if (!toggle) {
 
@@ -121,8 +122,7 @@ export const videoRouter = createTRPCRouter({
       }
 
       function VideoDataFetch() {
-
-
+       
 
         function convertToSeconds(str: string) {
           if (str.length > 6) {
@@ -202,6 +202,7 @@ export const videoRouter = createTRPCRouter({
         })
           .then((response) => response.json())
           .then(async (videoResult: TwitchVideoResponse) => {
+            
             const vidInfo = videoResult.data[0];
             if (vidInfo !== undefined) {
               await processVideo(vidInfo);
@@ -298,6 +299,7 @@ export const videoRouter = createTRPCRouter({
           vidId: string;
           commentId: string;
         }
+        
         //NOTE going forward use cursor going backwards use seconds found out the hard way
         let p = 0;
         let firstCommentCursor: string | null = null;
@@ -529,7 +531,7 @@ export const videoRouter = createTRPCRouter({
 
       }
     }),
-  getAll: publicProcedure
+  getFive: publicProcedure
     .query(async ({ ctx }) => {
       return ctx.prisma.video.findMany({
         select: {
@@ -548,14 +550,33 @@ export const videoRouter = createTRPCRouter({
         take: 5
       });
     }),
-
+    
+  getAll: publicProcedure
+    .query(async ({ ctx }) => {
+      return ctx.prisma.video.findMany({
+        select: {
+          title: true,
+          streamer: true,
+          views: true,
+          thumbnail: true,
+          language: true,
+          videoId: true,
+          date: true,
+          likes: true,
+        },
+        orderBy: {
+          likes: 'desc'
+        },
+    
+      });
+    }),
   deleteAll: publicProcedure
     .input(z.object({ videoId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const video = await ctx.prisma.video.findUnique({
-        where: { videoId: input.videoId },
-        select: { id: true, channelId: true },
-      });
+      // const video = await ctx.prisma.video.findUnique({
+      //   where: { videoId: input.videoId },
+      //   select: { id: true, channelId: true },
+      // });
 
 
 
@@ -578,7 +599,7 @@ export const videoRouter = createTRPCRouter({
       await ctx.prisma.channel.deleteMany({
 
       });
-      const vidId = video?.id;
+      // const vidId = video?.id;
 
       // if (vidId) {
 

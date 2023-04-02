@@ -38,129 +38,263 @@ export const cardRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-
       return await ctx.prisma.commentCard.findMany({
         where: {
           cardId: input.cardId,
-        }
-      })
+        },
+      });
     }),
   getCardComments: publicProcedure
     .input(
       z.object({
         cardId: z.string(),
-        timestamp: z.string()
+        timestamp: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-
       return await ctx.prisma.commentCard.findMany({
         where: {
           cardId: input.cardId,
-          timestamp: input.timestamp
+          timestamp: input.timestamp,
         },
         include: {
-          messages: true
-        }
-      })
+          messages: true,
+        },
+      });
     }),
-  likeCard: protectedProcedure.input(
-    z.object({
-      cardId: z.string(),
-      userId: z.string()
-    })
-  )
+  likeCard: protectedProcedure
+    .input(
+      z.object({
+        cardId: z.string(),
+        userId: z.string(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const test = await ctx.prisma.commentCard.findUnique({
         where: {
-          id: input.cardId
-        }
-      })
-      if (test?.liked.includes(input.userId)) return
-      const card = await ctx.prisma.commentCard.update({
-        where: {
-          id: input.cardId
+          id: input.cardId,
         },
-        data: {
-          likes: {
-            increment: 1
+      });
+      if (test?.liked.includes(input.userId)) return;
+      let card;
+
+      //both increment likes by 1 and add video to users likedCards array, either sets commentCard Finder to user id or not.
+      if (test?.finder) {
+        card = await ctx.prisma.commentCard.update({
+          where: {
+            id: input.cardId,
           },
-          liked: {
-            push: input.userId
-          }
+          data: {
+            likes: {
+              increment: 1,
+            },
+            liked: {
+              push: input.userId,
+            },
+          },
+        });
+        await ctx.prisma.user.update({
+          where: {
+            id: input.userId,
+          },
+          data: {
+            cardIds: {
+              push: card.id,
+            },
+            likedCards: {
+              connect: {
+                id: card.id,
+              },
+            },
+          },
+        });
+        if (card.finder && card.finder !== input.userId) {
+          await ctx.prisma.user.update({
+            where: {
+              id: card.finder,
+            },
+            data: {
+              likes: {
+                increment: 1,
+              },
+            },
+          });
         }
-      })
+      } else {
+        card = await ctx.prisma.commentCard.update({
+          where: {
+            id: input.cardId,
+          },
+          data: {
+            finder: input.userId,
+            likes: {
+              increment: 1,
+            },
+            liked: {
+              push: input.userId,
+            },
+          },
+        });
+        await ctx.prisma.user.update({
+          where: {
+            id: input.userId,
+          },
+          data: {
+            cardIds: {
+              push: card.id,
+            },
+            likedCards: {
+              connect: {
+                id: card.id,
+              },
+            },
+          },
+        });
+      }
 
       await ctx.prisma.video.update({
         where: {
-          id: card.vidId
+          id: card.vidId,
         },
         data: {
           likes: {
-            increment: 1
+            increment: 1,
           },
-        }
-      })
-      await ctx.prisma.card.update({
+        },
+      });
+     const termCard = await ctx.prisma.card.update({
         where: {
-          id: card.cardId
+          id: card.cardId,
         },
         data: {
           likes: {
-            increment: 1
+            increment: 1,
           },
-        }
-      })
-      return card
-    }), disLikeCard: protectedProcedure.input(
+        },
+      });
+      const data = {...card, cardLikes: termCard.likes}
+      return data
+    }),
+  disLikeCard: protectedProcedure
+    .input(
       z.object({
         cardId: z.string(),
-        userId: z.string()
+        userId: z.string(),
       })
     )
-      .mutation(async ({ ctx, input }) => {
-        const ogCard = await ctx.prisma.commentCard.findUnique({
+    .mutation(async ({ ctx, input }) => {
+      const test = await ctx.prisma.commentCard.findUnique({
+        where: {
+          id: input.cardId,
+        },
+      });
+      if (!test?.liked.includes(input.userId)) return;
+      let card;
+      const filtered = test?.liked.filter((id) => id !== input.userId);
+      //both increment likes by 1 and add video to users likedCards array, either sets commentCard Finder to user id or not.
+      if (test?.finder === input.userId) {
+        const user = await ctx.prisma.user.findUnique({
           where: {
-            id: input.cardId
+            id: input.userId,
           },
-        })
-        if (!ogCard?.liked.includes(input.userId)) return
-        const filtered = ogCard?.liked.filter((id) => id !== input.userId)
-        const card = await ctx.prisma.commentCard.update({
-          where: {
-            id: input.cardId
-          },
-          data: {
-            likes: {
-              decrement: 1
-            },
-            liked: {
-              set: filtered
-            }
-          }
-        })
+        });
 
-        await ctx.prisma.video.update({
+        const filteredCards = user?.cardIds?.filter(
+          (id) => id !== input.cardId
+        );
+        card = await ctx.prisma.commentCard.update({
           where: {
-            id: card.vidId
+            id: input.cardId,
           },
           data: {
             likes: {
-              decrement: 1
+              decrement: 1,
             },
-          }
-        })
-        await ctx.prisma.card.update({
+            liked: filtered,
+          },
+        });
+        await ctx.prisma.user.update({
           where: {
-            id: card.cardId
+            id: input.userId,
+          },
+          data: {
+            cardIds: filteredCards,
+            likedCards: {
+              disconnect: {
+                id: card.id,
+              },
+            },
+          },
+        });
+      } else {
+        const user = await ctx.prisma.user.findUnique({
+          where: {
+            id: input.userId,
+          },
+        });
+        const filteredCards = user?.cardIds?.filter(
+          (id) => id !== input.cardId
+        );
+        card = await ctx.prisma.commentCard.update({
+          where: {
+            id: input.cardId,
           },
           data: {
             likes: {
-              decrement: 1
+              decrement: 1,
             },
-          }
-        })
+            liked: filtered,
+          },
+        });
+        await ctx.prisma.user.update({
+          where: {
+            id: input.userId,
+          },
+          data: {
+            cardIds: filteredCards,
+            likedCards: {
+              disconnect: {
+                id: card.id,
+              },
+            },
+          },
+        });
 
-        return card
-      })
+        if (card.finder) {
+          await ctx.prisma.user.update({
+            where: {
+              id: card.finder,
+            },
+            data: {
+              likes: {
+                decrement: 1,
+              },
+            },
+          });
+        }
+      }
+
+      await ctx.prisma.video.update({
+        where: {
+          id: card.vidId,
+        },
+        data: {
+          likes: {
+            decrement: 1,
+          },
+        },
+      });
+      const termCard = await ctx.prisma.card.update({
+        where: {
+          id: card.cardId,
+        },
+        data: {
+          likes: {
+            decrement: 1,
+          },
+        },
+      });
+      const data = {...card, cardLikes: termCard.likes}
+      return data;
+    }),
 });

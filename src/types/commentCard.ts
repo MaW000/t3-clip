@@ -37,3 +37,16 @@ export interface Message {
     commenter: string | null;
     contentOffsetSeconds: number;
 }
+
+export interface CommentCard {
+    id: string;
+    timestamp: string;
+    contentOffsetSeconds: number;
+    count: number;
+    likes: number;
+    finder?: string;
+    liked: string[];
+    cardId: string[];
+    vidId: string;
+    msgIds: string[];
+  }

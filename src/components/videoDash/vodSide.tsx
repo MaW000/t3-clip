@@ -1,11 +1,12 @@
 import React from "react";
+
 import { ProgressBar, CommentCards } from "~/components";
 import type {
   Twitch,
   Card,
   SetCardsFunction,
 } from "~/types/commentCard";
-
+import { api } from "~/utils/api";
 export const VodSide = ({
   videoId,
   completed,
@@ -25,7 +26,18 @@ export const VodSide = ({
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
 
   const x = playerRef.current.clientHeight - 0;
+  const getComments = api.comment.getComments.useMutation({
+    onSuccess: () => console.log("success"),
+  });
+  const deleteAll = api.video.deleteAll.useMutation({
+    onSuccess: () => console.log("success"),
+  });
 
+  const checkDupe = api.comment.fetch.useMutation({
+    onSuccess: () => console.log("success"),
+  });
+
+ 
   return (
     <div
       style={{ height: x }}
@@ -39,6 +51,27 @@ export const VodSide = ({
         videoId={videoId}
         player={player}
       />
+            <button
+        onClick={() => deleteAll.mutate({ videoId: videoId })}
+        className=" bg-black px-2 text-white"
+      >
+        Delete Comments
+      </button>
+      <button
+        className=" bg-black px-2 text-white"
+        onClick={() =>
+          getComments.mutate({ videoId: videoId, keyword: "lul", interval: 5 })
+        }
+      >
+        Get Commesdfgsdfgnts
+      </button>
+
+      <button
+        className=" bg-black px-2 text-white"
+        onClick={() => checkDupe.mutate({ videoId: videoId })}
+      >
+        Check dupe
+      </button>
     </div>
   );
 };

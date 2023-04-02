@@ -1,19 +1,23 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { api } from "~/utils/api";
-export const VodThumbnails = ({}) => {
+
+interface Videos {
+  streamer: string;
+  videoId: number;
+  title: string;
+  thumbnail: string;
+  views: number;
+  likes: number;
+  language: string;
+  date: string;
+}
+export const VodThumbnails = ({videos}:  {videos: Videos[]}) => {
   const router = useRouter();
-  const videoArr = api.video.getAll.useQuery().data;
 
   return (
-    <div
-      className={`mx-auto mt-10 flex gap-4 rounded-lg bg-slate-500 p-2  ${
-        videoArr ? "" : "hidden"
-      }`}
-    >
-      {videoArr &&
-        videoArr.length >= 1 &&
-        videoArr.map((video, i) => {
+  <>
+      { videos &&  
+        videos.map((video, i) => {
           let thumbnail: string;
           if (video.thumbnail.includes("vod-secure")) {
             thumbnail = video.thumbnail
@@ -66,6 +70,6 @@ export const VodThumbnails = ({}) => {
             </div>
           );
         })}
-    </div>
+  </>
   );
 };
