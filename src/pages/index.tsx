@@ -21,10 +21,10 @@ const Home: NextPage = () => {
               <span className="text-periwinkle-gray-500">Next</span>.Clip
             </h1>
           </div>
-          <div className="mt-12 flex">
+          <div className="mt-12 flex justify-center">
       {videoThumbs && videoThumbs.length >= 1 && 
             <div
-              className={`mx-auto mt-10 flex gap-4 rounded-lg bg-slate-500 p-2  `}
+              className={` mt-10 mx-5 flex-wrap flex gap-4 rounded-lg bg-slate-500 p-2  `}
             >
               
               <VodThumbnails videos={videoThumbs} />

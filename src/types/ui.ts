@@ -1,0 +1,49 @@
+export interface Comment {
+  id: string;
+  timestamp: string;
+  contentOffsetSeconds: number;
+  count: number;
+  likes: number;
+  finder: string;
+  liked: string[];
+  last60: string[];
+  second: number;
+  last30: string[];
+  minute: number;
+  last24: string[];
+  day: number;
+  last7: string[];
+  week: number;
+  cardId: string;
+  vidId: string;
+  msgIds: string[];
+  video: {
+    id: string;
+    channelId: string;
+    videoId: number;
+    url: string;
+    description: string;
+    duration: string;
+    title: string;
+    thumbnail: string;
+    streamer: string;
+    views: number;
+    likes: number;
+    language: string;
+    date: string;
+    createdAt: string;
+    complete: boolean;
+  };
+  card: {
+    id: string;
+    vidId: string;
+    keyword: string;
+    interval: number;
+    likes: number;
+    sum: number;
+    avg: number;
+    max: number;
+    min: number;
+    url: string;
+  };
+}

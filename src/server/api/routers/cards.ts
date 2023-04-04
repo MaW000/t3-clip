@@ -75,6 +75,31 @@ export const cardRouter = createTRPCRouter({
           id: input.cardId,
         },
       });
+      const sec15 = new Date(Date.now() - 15 * 1000);
+
+      const lastWithin15Secs = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= sec15;
+      });
+      lastWithin15Secs?.push(new Date(Date.now()));
+      const min30 = new Date(Date.now() - 30 * 60 * 1000);
+      const last30Within30Mins = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= min30;
+      });
+      last30Within30Mins?.push(new Date(Date.now()));
+      const hr24 = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const lastWithin24Hr = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= hr24;
+      });
+      lastWithin24Hr?.push(new Date(Date.now()));
+      const day7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const lastWithin7D = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= day7;
+      });
+      lastWithin7D?.push(new Date(Date.now()));
       if (test?.liked.includes(input.userId)) return;
       let card;
 
@@ -88,6 +113,14 @@ export const cardRouter = createTRPCRouter({
             likes: {
               increment: 1,
             },
+            last60: lastWithin15Secs,
+            last24: lastWithin24Hr,
+            last30: last30Within30Mins,
+            last7: lastWithin7D,
+            second: lastWithin15Secs?.length,
+            minute: last30Within30Mins?.length,
+            day: lastWithin24Hr?.length,
+            week: lastWithin7D?.length,
             liked: {
               push: input.userId,
             },
@@ -130,6 +163,14 @@ export const cardRouter = createTRPCRouter({
             likes: {
               increment: 1,
             },
+            last60: lastWithin15Secs,
+            last24: lastWithin24Hr,
+            last30: last30Within30Mins,
+            last7: lastWithin7D,
+            second: lastWithin15Secs?.length,
+            minute: last30Within30Mins?.length,
+            day: lastWithin24Hr?.length,
+            week: lastWithin7D?.length,
             liked: {
               push: input.userId,
             },
@@ -162,7 +203,7 @@ export const cardRouter = createTRPCRouter({
           },
         },
       });
-     const termCard = await ctx.prisma.card.update({
+      const termCard = await ctx.prisma.card.update({
         where: {
           id: card.cardId,
         },
@@ -172,8 +213,8 @@ export const cardRouter = createTRPCRouter({
           },
         },
       });
-      const data = {...card, cardLikes: termCard.likes}
-      return data
+      const data = { ...card, cardLikes: termCard.likes };
+      return data;
     }),
   disLikeCard: protectedProcedure
     .input(
@@ -188,6 +229,31 @@ export const cardRouter = createTRPCRouter({
           id: input.cardId,
         },
       });
+      const sec15 = new Date(Date.now() - 15 * 1000);
+
+      const lastWithin15Secs = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= sec15;
+      });
+      lastWithin15Secs?.pop();
+      const min30 = new Date(Date.now() - 30 * 60 * 1000);
+      const last30Within30Mins = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= min30;
+      });
+      last30Within30Mins?.pop();
+      const hr24 = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const lastWithin24Hr = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= hr24;
+      });
+      lastWithin24Hr?.pop();
+      const day7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const lastWithin7D = test?.last30.filter((dateTime) => {
+        const date = new Date(dateTime);
+        return date >= day7;
+      });
+      lastWithin7D?.pop();
       if (!test?.liked.includes(input.userId)) return;
       let card;
       const filtered = test?.liked.filter((id) => id !== input.userId);
@@ -210,6 +276,7 @@ export const cardRouter = createTRPCRouter({
             likes: {
               decrement: 1,
             },
+
             liked: filtered,
           },
         });
@@ -243,6 +310,7 @@ export const cardRouter = createTRPCRouter({
             likes: {
               decrement: 1,
             },
+
             liked: filtered,
           },
         });
@@ -294,7 +362,7 @@ export const cardRouter = createTRPCRouter({
           },
         },
       });
-      const data = {...card, cardLikes: termCard.likes}
+      const data = { ...card, cardLikes: termCard.likes };
       return data;
     }),
 });

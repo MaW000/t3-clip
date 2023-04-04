@@ -18,10 +18,9 @@ export const SearchVod = ({ ...props }) => {
   }
 
   return (
-
     <div
       className={
-        " mt-3 ml-5  flex flex-col justify-center md:ml-7 lg:ml-0 lg:flex-row lg:space-x-5"
+        " mt-3 ml-5  flex flex-row justify-center md:ml-7 lg:ml-0 lg:flex-row lg:space-x-5"
       }
       {...props}
     >
@@ -36,7 +35,7 @@ export const SearchVod = ({ ...props }) => {
         <input
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://www.twitch.tv/videos/1749256306"
-          className="w-[40rem] text-lg"
+          className="w-[30rem] text-lg"
         />
       </div>
       {error && (
@@ -47,7 +46,7 @@ export const SearchVod = ({ ...props }) => {
           {error}
         </div>
       )}
-      <div className={"mt-2 flex flex-row gap-3 lg:mt-0"}>
+      <div className={"ml-5  flex flex-row gap-3 lg:mt-0"}>
      
         <button
           className="relative mt-5 inline-flex justify-center overflow-hidden rounded-lg bg-purple-400 py-2 px-3 text-sm font-semibold text-black outline-2 outline-offset-2 transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-purple-600 active:text-white/80 active:before:bg-transparent"
