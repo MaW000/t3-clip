@@ -51,7 +51,7 @@ export const VodSide = ({
         videoId={videoId}
         player={player}
       />
-            <button
+            {/* <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >
@@ -71,7 +71,7 @@ export const VodSide = ({
         onClick={() => checkDupe.mutate({ videoId: videoId })}
       >
         Check dupe
-      </button>
+      </button> */}
     </div>
   );
 };
