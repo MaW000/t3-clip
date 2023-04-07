@@ -15,7 +15,7 @@ export const CommentCards = ({
   if (!playerRef.current?.clientWidth) return <h1>Loading...</h1>;
 
   return (
-    <div className="my-2 mr-2 flex flex-col gap-2 ">
+    <div className="my-2 mr-2 flex  flex-col gap-2 ">
       {cards?.map((card: Card) => {
         if (!card.url) return;
 

@@ -1,9 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Comment } from "~/types/ui";
 
 
 export const LikedCards = ({recentCards}: {recentCards: Comment[]}) => {
     console.log(recentCards)
+    const handleClick = ( ) => {
+    
+    }
   return (
   <>
       { recentCards &&  
@@ -28,7 +32,7 @@ export const LikedCards = ({recentCards}: {recentCards: Comment[]}) => {
             {card.card.url && <Image src={card.card.url} height={50} width={50} alt="url" />}
             <h1 className="mt-3 mx-2 text-purple-400">{card.card.keyword}</h1>
             <h1 className="mt-3 mx-2">{card.minute}</h1>
-            <h1 className="text-blue-400 mt-3 mx-2 underline underline-offset-2">Timestamp</h1>
+            <Link href={`/video/${card.video.videoId}`} className="text-blue-400 mt-3 mx-2 underline underline-offset-2">{card.timestamp}</Link>
             <Image src={thumbnail} height={50} width={80} alt="video" className="hidden" />
             </div>
           );

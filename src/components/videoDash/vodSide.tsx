@@ -41,7 +41,7 @@ export const VodSide = ({
   return (
     <div
       style={{ height: x }}
-      className={`scrollbar-x relative col-start-10 col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
+      className={`scrollbar-x relative mr-12 ml-10 2xl:-ml-10 2xl:mr-0 2xl:col-start-10 2xl:col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
     >
       {completed && <ProgressBar videoId={videoId} />}
       <CommentCards
@@ -51,7 +51,7 @@ export const VodSide = ({
         videoId={videoId}
         player={player}
       />
-            <button
+            {/* <button
         onClick={() => deleteAll.mutate({ videoId: videoId })}
         className=" bg-black px-2 text-white"
       >
@@ -71,7 +71,7 @@ export const VodSide = ({
         onClick={() => checkDupe.mutate({ videoId: videoId })}
       >
         Check dupe
-      </button>
+      </button> */}
     </div>
   );
 };
