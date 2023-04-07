@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Pusher from "pusher-js";
 import Link from "next/link";
-export const ProgressBar = ({ videoId }: { videoId: number }) => {
+export const ProgressBar = ({ videoId,  }: { videoId: number }) => {
   const [num, setNum] = useState(0);
   const [connectionClosed, setConnectionClosed] = useState(false);
+  
   useEffect(() => {
     const pusher = new Pusher("40e81c6fead48e0b15a8", {
       cluster: "us2",

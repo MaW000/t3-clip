@@ -123,19 +123,28 @@ model Card {
 }
 
 model CommentCard {
-    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    id                   String     @id @default(auto()) @map("_id") @db.ObjectId
     timestamp            String
     contentOffsetSeconds Int
     count                Int
     likes                Int
-    liked                String[] @db.ObjectId
-    cardId               String   @db.ObjectId
-    vidId                String   @db.ObjectId
-    msgIds               String[] @db.ObjectId
-    card                 Card     @relation(fields: [cardId], references: [id])
-    video                Video    @relation(fields: [vidId], references: [id])
-    messages             Msg[]    @relation(fields: [msgIds], references: [id])
-    
+    finder               String?    @db.ObjectId
+    liked                String[]   @db.ObjectId
+    last60               DateTime[]
+    second               Int?
+    last30               DateTime[]
+    minute               Int?
+    last24               DateTime[]
+    day                  Int?
+    last7                DateTime[]
+    week                 Int?
+    cardId               String     @db.ObjectId
+    vidId                String     @db.ObjectId
+    msgIds               String[]   @db.ObjectId
+    users                User[]     @relation(fields: [liked], references: [id])
+    card                 Card       @relation(fields: [cardId], references: [id])
+    video                Video      @relation(fields: [vidId], references: [id])
+    messages             Msg[]      @relation(fields: [msgIds], references: [id])
 }
 
 model Msg {
@@ -159,11 +168,15 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(auto()) @map("_id") @db.ObjectId
+    id            String        @id @default(auto()) @map("_id") @db.ObjectId
+    username      String?       @unique
     name          String?
-    email         String?   @unique
+    email         String?       @unique
     emailVerified DateTime?
     image         String?
+    likes         Int           @default(0)
+    cardIds       String[]      @db.ObjectId
+    likedCards    CommentCard[] @relation(fields: [cardIds], references: [id])
     accounts      Account[]
     sessions      Session[]
 }

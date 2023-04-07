@@ -73,7 +73,7 @@ export const CardEle = ({
           <label className="labelCardsH">Likes</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
-            className={`float-right content-center  font-bold  text-purple-500 ${
+            className={`float-left ml-8  font-bold  text-purple-500 ${
               card.keyword.length > 20 ? "text-xl" : "text-xl"
             }`}
           >
@@ -84,7 +84,7 @@ export const CardEle = ({
           <label className="labelCardsH">Keyword</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
-            className={`float-right content-center  font-bold  text-purple-500 ${
+            className={`float-right  font-bold  text-purple-500 ${
               card.keyword.length > 20 ? "text-xl" : "text-xl"
             }`}
           >
@@ -94,7 +94,7 @@ export const CardEle = ({
         <div className="relative ml-7 h-10 w-10">
           <label className="labelCardsH">Interval</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
-          <h1 className="  content-center justify-center align-middle text-xl font-bold text-purple-500">
+          <h1 className="  justify-center align-middle text-xl font-bold text-purple-500">
             {card.interval}s
           </h1>
         </div>
@@ -185,8 +185,10 @@ export const Timestamps = ({
       }) ?? null;
     setCards(updatedCards);
   };
+  
   const handleLikes = api.card.likeCard.useMutation({
     onSuccess: (data) => {
+      console.log(data)
       const updatedCards: Card[] =
         cards.map((card) => {
           if (!data) return { ...card };
@@ -203,7 +205,7 @@ export const Timestamps = ({
             return {
               ...card,
               timestamps: updatedTimestamps,
-              likes: card.likes,
+              likes: data.cardLikes,
             };
           }
           return card;
@@ -229,7 +231,7 @@ export const Timestamps = ({
             return {
               ...card,
               timestamps: updatedTimestamps,
-              likes: card.likes,
+              likes: data.cardLikes,
             };
           }
           return card;
@@ -239,7 +241,7 @@ export const Timestamps = ({
   });
   const session = useSession();
   const id = session.data?.user.id;
-
+  
   return (
     <div key={timestamp.id} className={`relative flex justify-center gap-5 pt-7`}>
       <div className="relative float-left mr-14 justify-end">
@@ -346,7 +348,7 @@ export const TimestampFilter = ({
 }) => {
   const getTimestamps = api.card.getCard.useMutation({
     onSuccess: (data) => {
-      console.log(data, "1");
+      
       const updatedCards =
         cards?.map((card) => {
           if (!data[0]) return { ...card };
