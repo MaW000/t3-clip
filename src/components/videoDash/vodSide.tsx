@@ -26,16 +26,16 @@ export const VodSide = ({
   if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
 
   const x = playerRef.current.clientHeight - 0;
-  const getComments = api.comment.getComments.useMutation({
-    onSuccess: () => console.log("success"),
-  });
-  const deleteAll = api.video.deleteAll.useMutation({
-    onSuccess: () => console.log("success"),
-  });
+  // const getComments = api.comment.getComments.useMutation({
+  //   onSuccess: () => console.log("success"),
+  // });
+  // const deleteAll = api.video.deleteAll.useMutation({
+  //   onSuccess: () => console.log("success"),
+  // });
 
-  const checkDupe = api.comment.fetch.useMutation({
-    onSuccess: () => console.log("success"),
-  });
+  // const checkDupe = api.comment.fetch.useMutation({
+  //   onSuccess: () => console.log("success"),
+  // });
 
  
   return (

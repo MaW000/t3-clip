@@ -4,10 +4,7 @@ import type { Comment } from "~/types/ui";
 
 
 export const LikedCards = ({recentCards}: {recentCards: Comment[]}) => {
-    console.log(recentCards)
-    const handleClick = ( ) => {
-    
-    }
+   
   return (
   <>
       { recentCards &&  
