@@ -17,7 +17,7 @@ export const uiRouter = createTRPCRouter({
   getRecentCards: publicProcedure.query(async ({ ctx }) => {
     const top20BySecond = ctx.prisma.commentCard.findMany({
       where: {
-        second: { gt: 1 },
+        second: { gt: 0 },
       },
       orderBy: {
         second: "desc",
@@ -31,7 +31,7 @@ export const uiRouter = createTRPCRouter({
 
     const top20ByMinute = ctx.prisma.commentCard.findMany({
       where: {
-        minute: { gt: 1 },
+        minute: { gt: 0 },
       },
       orderBy: {
         minute: "desc",
@@ -45,7 +45,7 @@ export const uiRouter = createTRPCRouter({
 
     const top20ByDay = ctx.prisma.commentCard.findMany({
       where: {
-        day: { gt: 1 },
+        day: { gt: 0 },
       },
       orderBy: {
         day: "desc",
@@ -59,7 +59,7 @@ export const uiRouter = createTRPCRouter({
 
     const top20ByWeek = ctx.prisma.commentCard.findMany({
       where: {
-        week: { gt: 1 },
+        week: { gt: 0 },
       },
       orderBy: {
         week: "desc",

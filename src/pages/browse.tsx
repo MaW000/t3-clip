@@ -3,10 +3,10 @@ import { HeaderMain, VodThumbnails, TopUsers, LikedCards } from "~/components";
 import Head from "next/head";
 import { api } from "~/utils/api";
 import {useState} from "react"
+import type { SetTimeFunction } from "~/types/Browse";
 const BrowsePage: NextPage = () => {
   const [time, setTime] = useState('sec')
   const topUsers = api.ui.getTopUsers.useQuery().data;
-  const recentCards = api.ui.getRecentCards.useQuery().data;
 
   return (
     <>
@@ -44,12 +44,13 @@ const BrowsePage: NextPage = () => {
   );
 };
 
-export const TimeMark = ({time, setTime}: {time: string}) => {
+export const TimeMark = ({time, setTime}: {time: string, setTime: SetTimeFunction}) => {
 
   const recentCards = api.ui.getRecentCards.useQuery().data;
   const cards = time === 'sec' ? recentCards?.top20CardsBySecond : time === "minute" ? recentCards?.top20CardsByMinute : time === "day" ? recentCards?.top20CardsByDay : time === "week" ? recentCards?.top20CardsByWeek : recentCards?.top20CardsBySecond;
   const string = time === 'sec' ? "Most Liked 60 Seconds:               " : time === "minute" ? "Most Liked 30 Minutes:               " : time === "day" ? "Most Liked 24 Hours:               " : time === "week" ? "Most Liked 7 Days:               " : "Most Liked 60 Seconds:               "
   const nextTime = time === 'sec' ? 'minute' : time === 'minute' ? 'day' : time === 'day' ? 'week' : 'sec'
+  console.log(cards, recentCards)
   return (
     <>
     
@@ -57,7 +58,7 @@ export const TimeMark = ({time, setTime}: {time: string}) => {
               {string}<span className="absolute right-14 cursor-pointer" onClick={() => setTime(nextTime)}>{"><>"}</span>
               </h1>
               <div className="flex flex-col  gap-5">
-                {recentCards?.top20CardsBySecond && (
+                {cards && (
                   <LikedCards recentCards={cards} />
                 )}
     </div>

@@ -6,7 +6,6 @@ import type {
   Timestamp,
   Twitch,
   Message,
-  
 } from "~/types/commentCard";
 import { useSession } from "next-auth/react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
