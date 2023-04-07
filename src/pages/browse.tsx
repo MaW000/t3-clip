@@ -50,7 +50,7 @@ export const TimeMark = ({time, setTime}: {time: string, setTime: SetTimeFunctio
   const cards = time === 'sec' ? recentCards?.top20CardsBySecond : time === "minute" ? recentCards?.top20CardsByMinute : time === "day" ? recentCards?.top20CardsByDay : time === "week" ? recentCards?.top20CardsByWeek : recentCards?.top20CardsBySecond;
   const string = time === 'sec' ? "Most Liked 60 Seconds:               " : time === "minute" ? "Most Liked 30 Minutes:               " : time === "day" ? "Most Liked 24 Hours:               " : time === "week" ? "Most Liked 7 Days:               " : "Most Liked 60 Seconds:               "
   const nextTime = time === 'sec' ? 'minute' : time === 'minute' ? 'day' : time === 'day' ? 'week' : 'sec'
-  console.log(cards, recentCards)
+
   return (
     <>
     

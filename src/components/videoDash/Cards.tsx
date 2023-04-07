@@ -188,7 +188,7 @@ export const Timestamps = ({
   
   const handleLikes = api.card.likeCard.useMutation({
     onSuccess: (data) => {
-      console.log(data)
+     
       const updatedCards: Card[] =
         cards.map((card) => {
           if (!data) return { ...card };

@@ -110,10 +110,7 @@ export const videoRouter = createTRPCRouter({
 
             await ctx.prisma.emote.createMany({ data: uniqueEmoteData as EmoteCreateManyInput[] })
 
-          } else {
-            const { log } = console
-            log('no new Emotes from this user')
-          }
+          } 
         }
 
         const info = await getStreamEleUserData(username)
