@@ -34,7 +34,7 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
       >
         <Link
           href="/"
-          className="relative inline-block h-12 w-[15%]  rounded-l-lg bg-purple-400 py-2 text-center  font-mono  text-sm   font-bold leading-none text-purple-600  transition duration-300 hover:bg-purple-600 hover:text-white hover:shadow-lg"
+          className="relative inline-block h-12 w-[15%]  rounded-l-lg bg-purple-400 py-2 text-center  font-mono  text-sm md:text-2xl  font-bold leading-none text-purple-600  transition duration-300 hover:bg-purple-600 hover:text-white hover:shadow-lg"
         >
           NextClip
           <div className="absolute bottom-1  left-1/2 flex h-1 w-1/2 -translate-x-1/2  items-center justify-center bg-purple-400" />

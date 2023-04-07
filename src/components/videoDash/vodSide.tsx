@@ -41,7 +41,7 @@ export const VodSide = ({
   return (
     <div
       style={{ height: x }}
-      className={`scrollbar-x relative col-start-10 col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
+      className={`scrollbar-x relative mr-20 ml-10 2xl:-ml-10 2xl:mr-0 2xl:col-start-10 2xl:col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
     >
       {completed && <ProgressBar videoId={videoId} />}
       <CommentCards

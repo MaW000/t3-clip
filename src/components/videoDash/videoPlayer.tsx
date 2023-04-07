@@ -63,7 +63,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
 
   return (
     <div className="relative">
-      <div className="mx-5 bg-slate-700 md:grid md:grid-cols-12">
+      <div className="mx-5 bg-slate-700 xl:grid xl:grid-cols-12">
         <div
           id="player"
           ref={playerRef}
