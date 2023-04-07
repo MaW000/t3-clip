@@ -55,9 +55,12 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
       {/* login bar */}
       {error && <h1>{error}</h1>}
       {!sessionData ? (
-        <div className=" col-end-13    ">
+        <div className=" col-start-11 col-end-13    ">
+          <Link href="/browse" className=" mr-10 py-3 px-5  bg-white/10 rounded-full   leading-none font-semibold text-white no-underline transition ">
+            Browse
+          </Link>
           <button
-            className="mr-0 -ml-2  rounded-full  bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
+            className=" rounded-full py-3 px-10  bg-white/10 font-semibold text-white no-underline transition hover:bg-white/20"
             onClick={() => void signIn()}
           >
            Sign In
