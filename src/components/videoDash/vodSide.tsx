@@ -37,11 +37,12 @@ export const VodSide = ({
   //   onSuccess: () => console.log("success"),
   // });
 
- 
+  console.log(completed)
   return (
     <div
       style={{ height: x }}
-      className={`scrollbar-x relative mr-12 ml-10 2xl:-ml-10 2xl:mr-0 2xl:col-start-10 2xl:col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
+      className="col-start-10 col-span-12 "
+      // className={`scrollbar-x relative mr-12 ml-10 2xl:-ml-10 w-full 2xl:mr-0 2xl:col-start-10 2xl:col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
     >
       {completed && <ProgressBar videoId={videoId} />}
       <CommentCards

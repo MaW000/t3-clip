@@ -56,22 +56,22 @@ export const CardEle = ({
           handleHideTimestamps();
         }
       }}
-      className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-3"
+      className="flex flex-col w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-3"
     >
-      <div className="relative mb-5 h-10 w-14">
+      <div className="relative mb-5 h-14 w-14">
         {card.url && (
           <Image
             src={card.url}
             alt="emote"
             fill={true}
-            className="  h-auto w-full object-cover"
+            className="  h-full w-full object-cover"
           />
         )}
       </div>
       <div className="ml-auto mr-5 mb-3 flex">
-        <div className="relative mr-20  h-10 w-20">
+        <div className="relative mr-0 h-10 w-20">
           <label className="labelCardsH">Likes</label>
-          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
+          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[100%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
             className={`float-left ml-8  font-bold  text-purple-500 ${
               card.keyword.length > 20 ? "text-xl" : "text-xl"
@@ -82,7 +82,7 @@ export const CardEle = ({
         </div>
         <div className="relative ml-auto  h-10 w-20">
           <label className="labelCardsH">Keyword</label>
-          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
+          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[100%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
             className={`float-right  font-bold  text-purple-500 ${
               card.keyword.length > 20 ? "text-xl" : "text-xl"
@@ -91,9 +91,9 @@ export const CardEle = ({
             {card.keyword}
           </h1>
         </div>
-        <div className="relative ml-7 h-10 w-10">
+        <div className="relative ml-2 h-10 w-10">
           <label className="labelCardsH">Interval</label>
-          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
+          <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[100%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1 className="  justify-center align-middle text-xl font-bold text-purple-500">
             {card.interval}s
           </h1>

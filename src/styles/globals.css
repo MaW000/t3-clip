@@ -29,9 +29,9 @@ body {
 
 @layer components {
   .labelCards {
-    @apply absolute bottom-7 right-1 -translate-x-1/2 transform font-mono  text-periwinkle-gray-500;
+    @apply absolute bottom-7 right-1 -translate-x-1/2 transform font-mono text-periwinkle-gray-500  text-sm;
   }
   .labelCardsH {
-    @apply absolute -bottom-8 left-1/2 -translate-x-1/2 transform font-mono text-lg  text-periwinkle-gray-500;
+    @apply absolute -bottom-8 left-1/2 -translate-x-1/2 transform font-mono text-sm  text-periwinkle-gray-500;
   }
 }

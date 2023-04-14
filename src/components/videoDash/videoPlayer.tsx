@@ -35,7 +35,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
     const twitch: TwitchObject = (window as MyWindow).Twitch || {};
     if (!playerRef.current?.clientWidth) return;
     if (!twitch.Player) return
-    const w = playerRef.current.clientWidth - 50;
+    const w = playerRef.current.clientWidth ;
     const h = (9 / 16) * w;
     const options: PlayerOptions = {
       width: w,
@@ -67,7 +67,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         <div
           id="player"
           ref={playerRef}
-          className=" col-span-9 col-start-1  row-span-full  "
+          className="col-span-9 col-start-1 row-span-full "
         ></div>
 
         <VodSide
