@@ -6,7 +6,7 @@ import type {
   Card,
   SetCardsFunction,
 } from "~/types/commentCard";
-import { api } from "~/utils/api";
+
 export const VodSide = ({
   videoId,
   completed,
