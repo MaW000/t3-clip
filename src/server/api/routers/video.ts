@@ -47,36 +47,32 @@ export const videoRouter = createTRPCRouter({
         return false;
       }
 
-      function processVideo(): Promise<boolean> {
-        return new Promise(async (resolve, reject) => {
-          try {
-            const vidInfo = await grabVideoData();
-            if (!vidInfo) return;
-            let chanExists = await checkChanExist(vidInfo);
-            if (!chanExists) {
-              chanExists = await createChannel(vidInfo);
-
-              const checkIfChannelHasData = await getChannelEmotesUrls(
-                chanExists
-              );
-              if (checkIfChannelHasData) {
-                chanExists = checkIfChannelHasData;
-                if (chanExists.seId)
-                  await addEmotesToChannel(chanExists.streamer, chanExists.id);
-              } else {
-                // await ctx.prisma.video.NO EMOTES
-              }
+      async function processVideo() {
+        try {
+          const vidInfo = await grabVideoData();
+          if (!vidInfo) return false;
+          let chanExists = await checkChanExist(vidInfo);
+          if (!chanExists) {
+            chanExists = await createChannel(vidInfo);
+            const checkIfChannelHasData = await getChannelEmotesUrls(
+              chanExists
+            );
+            if (checkIfChannelHasData) {
+              chanExists = checkIfChannelHasData;
+              if (chanExists.seId)
+                await addEmotesToChannel(chanExists.streamer, chanExists.id);
+            } else {
+              // await ctx.prisma.video.NO EMOTES
             }
-
-            const videoInfo = await createVideo(vidInfo, chanExists);
-            const vidLengthS = convertToSeconds(videoInfo.duration);
-            const midSecond = Math.floor(vidLengthS / 2);
-            await getComments(0.0, vidLengthS, midSecond, videoInfo.id);
-            resolve(true);
-          } catch (error) {
-            reject(error);
           }
-        });
+          const videoInfo = await createVideo(vidInfo, chanExists);
+          const vidLengthS = convertToSeconds(videoInfo.duration);
+          const midSecond = Math.floor(vidLengthS / 2);
+          await getComments(0.0, vidLengthS, midSecond, videoInfo.id);
+        } catch (error) {
+          console.error(error);
+          return false;
+        }
       }
       async function addEmotesToChannel(
         streamerUsername: string,
