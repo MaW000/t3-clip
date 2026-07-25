@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind 4 is CSS-first, so the palette that used to live in
+ * tailwind.config.cjs `theme.extend.colors` is declared here instead. The class
+ * names are unchanged - `text-periwinkle-gray-500` still resolves.
+ */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --color-casablanca-50: #fefbf6;
+  --color-casablanca-100: #fef7ed;
+  --color-casablanca-200: #fcecd2;
+  --color-casablanca-300: #f9e0b7;
+  --color-casablanca-400: #f5c980;
+  --color-casablanca-500: #f1b24a;
+  --color-casablanca-600: #d9a043;
+  --color-casablanca-700: #b58638;
+  --color-casablanca-800: #916b2c;
+  --color-casablanca-900: #765724;
+
+  --color-tamarind-50: #f5f3f3;
+  --color-tamarind-100: #eae7e6;
+  --color-tamarind-200: #cbc3c1;
+  --color-tamarind-300: #ac9f9c;
+  --color-tamarind-400: #6e5852;
+  --color-tamarind-500: #301008;
+  --color-tamarind-600: #2b0e07;
+  --color-tamarind-700: #240c06;
+  --color-tamarind-800: #1d0a05;
+  --color-tamarind-900: #180804;
+
+  --color-periwinkle-gray-50: #fcfdff;
+  --color-periwinkle-gray-100: #fafbfe;
+  --color-periwinkle-gray-200: #f2f5fd;
+  --color-periwinkle-gray-300: #ebeffb;
+  --color-periwinkle-gray-400: #dbe2f9;
+  --color-periwinkle-gray-500: #ccd6f6;
+  --color-periwinkle-gray-600: #b8c1dd;
+  --color-periwinkle-gray-700: #99a1b9;
+  --color-periwinkle-gray-800: #7a8094;
+  --color-periwinkle-gray-900: #646979;
+
+  --color-pizazz-50: #fff9f2;
+  --color-pizazz-100: #fff4e6;
+  --color-pizazz-200: #ffe2bf;
+  --color-pizazz-300: #ffd199;
+  --color-pizazz-400: #ffaf4d;
+  --color-pizazz-500: #ff8c00;
+  --color-pizazz-600: #e67e00;
+  --color-pizazz-700: #bf6900;
+  --color-pizazz-800: #995400;
+  --color-pizazz-900: #7d4500;
+}
+
+/*
+ * Was `@apply bg-gradient-to-b from-[#242424] to-[#15162c]`. Tailwind 4 renamed
+ * those utilities to `bg-linear-*`, so this is written as plain CSS to keep the
+ * background pinned to the exact colours regardless of utility naming.
+ */
+body {
+  background-image: linear-gradient(to bottom, #242424, #15162c);
+}
+
+/* Custom scrollbar on the vod side panel and the emote carousel. */
+@utility scrollbar-x {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #18181b;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #68686a;
+    border-radius: 100vh;
+    border: 3px solid #68686a;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #18181b;
+  }
+}
+
+/*
+ * Floating labels on the card stat blocks. Written as plain declarations rather
+ * than `@apply` in a `components` layer so they are emitted unconditionally.
+ * Neither class sets a property the utilities alongside it in JSX also set.
+ */
+.labelCards {
+  position: absolute;
+  right: calc(var(--spacing) * 1);
+  bottom: calc(var(--spacing) * 7);
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  color: var(--color-periwinkle-gray-500);
+}
+
+.labelCardsH {
+  position: absolute;
+  bottom: calc(var(--spacing) * -7);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  line-height: var(--tw-leading, var(--text-lg--line-height));
+  color: var(--color-periwinkle-gray-500);
+}

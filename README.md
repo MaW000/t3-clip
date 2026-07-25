@@ -20,8 +20,11 @@ Two deployments sharing one Neon Postgres database:
 
 | Piece | Runs on | Job |
 | --- | --- | --- |
-| Next.js app | Vercel | UI, auth, card generation. Enqueues VODs, never calls Twitch. |
+| [`web/`](web/) | Vercel | Next.js app. UI, auth, card generation. Enqueues VODs, never calls Twitch. |
 | [`worker/`](worker/) | Railway | Long-running consumer. Indexes VOD chat and channel emotes. |
+
+The repo root holds no code of its own — everything lives in one of those two
+directories. **On Vercel, set the project's Root Directory to `web`.**
 
 Pasting a video writes a `QUEUED` row to `video_jobs`. The worker claims it,
 fetches metadata, stores the channel's emotes, then walks the VOD timeline
@@ -40,8 +43,9 @@ details and Railway setup.
 # Setup
 
 ```bash
+cd web
 npm install
-cp .env.example .env      # fill in DATABASE_URL
+cp .env.example .env      # fill in DATABASE_URL, AUTH_SECRET, GOOGLE_CLIENT_*
 npx prisma db push        # creates the tables, including video_jobs
 npm run dev
 ```
@@ -49,3 +53,17 @@ npm run dev
 Then start the worker (see [`worker/README.md`](worker/README.md)) pointed at the
 same `DATABASE_URL`. Without it, videos will sit at 0% forever — the web app
 enqueues but never indexes.
+
+## Vercel
+
+Root Directory must be `web`. Required environment variables:
+
+| Variable | Notes |
+| --- | --- |
+| `DATABASE_URL` | Same Neon database the worker uses. |
+| `AUTH_SECRET` | Renamed from `NEXTAUTH_SECRET` in the NextAuth v5 upgrade. |
+| `GOOGLE_CLIENT_ID` | |
+| `GOOGLE_CLIENT_SECRET` | |
+
+`NEXTAUTH_URL` is no longer used — v5 infers the deployment URL. `postinstall`
+runs `prisma generate`, so the client is built on every deploy.
