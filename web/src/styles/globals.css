@@ -9,6 +9,13 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+  /*
+   * `font-mono` carries the stat blocks, timestamps and section headings on
+   * every screen, so it is a loaded face rather than the browser's default.
+   */
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
   --color-casablanca-50: #fefbf6;
   --color-casablanca-100: #fef7ed;
   --color-casablanca-200: #fcecd2;
@@ -87,24 +94,12 @@ body {
 }
 
 /*
- * Floating labels on the card stat blocks. Written as plain declarations rather
- * than `@apply` in a `components` layer so they are emitted unconditionally.
- * Neither class sets a property the utilities alongside it in JSX also set.
- */
-.labelCards {
-  position: absolute;
-  right: calc(var(--spacing) * 1);
-  bottom: calc(var(--spacing) * 7);
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  color: var(--color-periwinkle-gray-500);
-}
-
-/*
  * Tailwind 4's preflight strips the browser default border and makes form
  * controls transparent, which left the search inputs as invisible boxes with
  * black text on the dark gradient. This is the shared field look - callers add
- * their own rounding, since the header input sits flush inside a button group.
+ * their own rounding. The header input styles itself instead: the `border`
+ * shorthand here cannot be undone by a `border-x-0` alongside it, and that
+ * group needs no side borders.
  */
 @utility field {
   background-color: #1f2030;
@@ -122,15 +117,4 @@ body {
     box-shadow: 0 0 0 2px
       color-mix(in srgb, var(--color-purple-400) 40%, transparent);
   }
-}
-
-.labelCardsH {
-  position: absolute;
-  bottom: calc(var(--spacing) * -7);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: var(--text-lg);
-  line-height: var(--tw-leading, var(--text-lg--line-height));
-  color: var(--color-periwinkle-gray-500);
 }

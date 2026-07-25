@@ -1,54 +1,48 @@
 import Image from "next/image";
+
 interface User {
-    name: string | null;
-    likes: number;
-    image: string | null;
-  }
+  name: string | null;
+  likes: number;
+  image: string | null;
+}
 
-
-export const TopUsers = ({topUsers}: {topUsers: User[]}) => {
- 
-
+/**
+ * The leaderboard. Rank comes from the query's order rather than a stored
+ * column, so it is the row index.
+ */
+export const TopUsers = ({ topUsers }: { topUsers: User[] }) => {
   return (
-  <>
-      { topUsers?.map((user, i) => {
-          const subname = user?.name?.substring(0, 7);
-          return (
-            <div
-              key={i}
-              className={
-                " flex items-center gap-3 md:gap-5  justify-between  cursor-pointer rounded-md border-4 border-slate-900 bg-slate-700 p-2 md:mx-5 drop-shadow-lg"
-              }
-            >   
-            {user.image &&  <Image src={user.image} alt="Profile Pic" width={50} height={50}  className="shrink-0 rounded-lg"/>}
-            <div className="relative mt-2  mb-2">
-                <label className=" absolute left-1/2 -top-3.5 -translate-x-1/2 transform text-xs font-semibold text-periwinkle-gray-400 underline">
-                  Rank
-                </label>
-                <h1 className="py-1 font-bold text-purple-500 ">
-                  {i + 1}
-                </h1>
-            </div>
-            <div className="relative mb-2 mt-2">
-                <label className=" absolute left-1/2 -top-3.5 -translate-x-1/2 transform text-xs font-semibold text-periwinkle-gray-400 underline">
-                  User
-                </label>
-                <h1 className="py-1 font-bold text-purple-500 ">
-                  {subname}
-                </h1>
-            </div>
-            <div className="relative  mt-2">
-                <label className=" absolute left-1/2 -top-3.5 -translate-x-1/2 transform text-xs font-semibold text-periwinkle-gray-400 underline">
-                  Total
-                </label>
-                <h1 className="py-1 font-bold text-purple-500 ">
-                  {user.likes}
-                </h1>
-            </div>
+    <>
+      {topUsers?.map((user, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-3 rounded-[10px] border border-slate-900 bg-slate-800 px-3 py-2.5"
+        >
+          <span className="text-periwinkle-gray-900 w-6 shrink-0 font-mono text-[13px]">
+            {i + 1}
+          </span>
 
-            </div>
-          );
-        })}
-  </>
+          {user.image ? (
+            <Image
+              src={user.image}
+              alt={user.name ?? "Profile Pic"}
+              width={36}
+              height={36}
+              className="h-9 w-9 shrink-0 rounded-lg object-cover"
+            />
+          ) : (
+            <span className="h-9 w-9 shrink-0 rounded-lg bg-slate-900" />
+          )}
+
+          <span className="text-periwinkle-gray-400 min-w-0 flex-1 truncate text-sm font-semibold">
+            {user.name ?? "anonymous"}
+          </span>
+
+          <span className="font-mono text-xs text-[#64ffda]">
+            {user.likes.toLocaleString()}
+          </span>
+        </div>
+      ))}
+    </>
   );
 };

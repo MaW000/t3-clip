@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 
 import { parseVodId } from "@/lib/vodId";
 
-export const SearchVod = ({ ...props }) => {
+/**
+ * The home page's vod box. The header search on the other pages does the same
+ * job through the same parser - this one gets the label and the hint because it
+ * is the first thing anyone does here.
+ */
+export const SearchVod = () => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+
   function handleUrl() {
     const videoId = parseVodId(url);
 
@@ -22,44 +28,35 @@ export const SearchVod = ({ ...props }) => {
   }
 
   return (
-    <div
-      className={
-        " mt-3 flex w-full flex-col items-stretch px-4 sm:flex-row sm:items-start sm:justify-center sm:px-5 lg:space-x-5"
-      }
-      {...props}
-    >
-      <div
-        className={`flex w-full flex-col text-start sm:w-auto  ${
-          error && "border-b-2 border-b-amber-600"
-        }`}
-      >
-        <label className="text-base font-medium text-periwinkle-gray-500">
-          TWITCH VOD URL
-        </label>
-        <input
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://www.twitch.tv/videos/1749256306"
-          className="field w-full max-w-full rounded-lg text-base sm:w-[30rem] sm:text-lg"
-        />
-        {error && (
-          <div
-            className="mt-1 font-sans text-base font-thin
-         text-amber-600 sm:text-lg"
-          >
-            {error}
-          </div>
-        )}
-      </div>
-      <div className={"mt-3 flex flex-row gap-3 sm:mt-0 sm:ml-5"}>
+    <div className="flex w-full max-w-[720px] flex-col gap-2.5 rounded-[14px] border border-slate-900 bg-slate-800 p-6">
+      <label className="text-periwinkle-gray-500 font-mono text-[11px] tracking-[.16em]">
+        TWITCH VOD URL
+      </label>
 
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleUrl()}
+          placeholder="https://www.twitch.tv/videos/1749256306"
+          className="field h-12 min-w-0 flex-1 rounded-[10px] text-base"
+        />
         <button
-          className="relative inline-flex w-full justify-center overflow-hidden rounded-lg bg-purple-400 py-2 px-3 text-sm font-semibold text-black outline-2 outline-offset-2 transition-colors before:absolute before:inset-0 before:transition-colors hover:before:bg-white/10 active:bg-purple-600 active:text-white/80 active:before:bg-transparent sm:mt-5 sm:w-auto"
           onClick={handleUrl}
+          className="h-12 shrink-0 cursor-pointer rounded-[10px] bg-purple-400 px-7 text-[15px] font-bold text-[#15162c] transition duration-200 hover:bg-purple-600 hover:text-white"
         >
           Submit
         </button>
-
       </div>
+
+      {error ? (
+        <p className="text-[13px] text-amber-600">{error}</p>
+      ) : (
+        <p className="text-periwinkle-gray-900 text-[13px]">
+          Any recent broadcast id or url works. Indexing starts as soon as you
+          submit.
+        </p>
+      )}
     </div>
   );
 };

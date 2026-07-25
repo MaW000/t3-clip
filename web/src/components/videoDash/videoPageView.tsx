@@ -10,8 +10,9 @@ import { api } from "@/trpc/react";
  * Client half of the video route.
  *
  * The Twitch embed script attaches `window.Twitch` and the player can only be
- * constructed after it has loaded, so the dashboard stays unmounted until
- * `onReady` fires. This was the body of the old `pages/video/[...id].tsx`.
+ * constructed after it has loaded, so `onReady` is passed down as `playerReady`
+ * rather than gating the whole dashboard: a blocked or slow script now costs
+ * the embed, not the timestamps and chat beside it.
  */
 export const VideoPageView = ({ videoId }: { videoId: number }) => {
   const [toggle, setToggle] = useState(false);
@@ -36,7 +37,7 @@ export const VideoPageView = ({ videoId }: { videoId: number }) => {
         return status === "DONE" || status === "FAILED" ? false : 1000;
       },
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   const status = job?.status;
@@ -59,9 +60,9 @@ export const VideoPageView = ({ videoId }: { videoId: number }) => {
           setToggle(true);
         }}
       />
-      <main className="min-h-screen ">
+      <main className="min-h-screen pb-10">
         <HeaderMain toggleSearch={true} />
-        {toggle && <VideoDash videoId={videoId} indexing={indexing} />}
+        <VideoDash videoId={videoId} indexing={indexing} playerReady={toggle} />
       </main>
     </>
   );

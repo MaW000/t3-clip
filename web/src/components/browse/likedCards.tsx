@@ -1,38 +1,71 @@
 import Image from "next/image";
 import Link from "next/link";
+import { AiFillHeart } from "react-icons/ai";
+
 import type { Comment } from "@/types/ui";
+import type { TimeRange } from "@/types/Browse";
 
+//the list is ranked by the active window's counter, so that is the number to
+//show - "41" beside a 60s row means 41 likes in the last minute, not ever
+const COUNTER: Record<TimeRange, keyof Comment> = {
+  sec: "second",
+  minute: "minute",
+  day: "day",
+  week: "week",
+};
 
-export const LikedCards = ({recentCards}: {recentCards: Comment[]}) => {
-   
+export const LikedCards = ({
+  recentCards,
+  range,
+}: {
+  recentCards: Comment[];
+  range: TimeRange;
+}) => {
   return (
-  <>
-      { recentCards?.map((card, i) => {
-            let thumbnail: string;
-            if (card.video.thumbnail.includes("vod-secure")) {
-              thumbnail = card.video.thumbnail
-                .replace(/%{width}/, "320")
-                .replace(/%{height}/, "180");
-            } else {
-              thumbnail = card.video.thumbnail
-                .replace(/%{width}/, "480")
-                .replace(/%{height}/, "270");
-            }
-          return (
-            <div
-              key={i}
-              className={
-                " flex flex-wrap items-center rounded-md border-4 border-slate-900 bg-slate-700 p-2 md:ml-2 drop-shadow-lg"
-              }
+    <>
+      {recentCards?.map((card) => {
+        const counter = card[COUNTER[range]];
+        const likes = typeof counter === "number" ? counter : card.likes;
+
+        return (
+          <div
+            key={card.id}
+            className="flex items-center gap-3 rounded-[10px] border border-slate-900 bg-slate-800 px-3 py-2.5"
+          >
+            {/* word cards carry no image - the keyword itself becomes the tile,
+                so every row lines up at the same width */}
+            {card.card.url ? (
+              <Image
+                src={card.card.url}
+                alt={card.card.keyword}
+                width={36}
+                height={36}
+                className="h-9 w-9 shrink-0 object-contain"
+              />
+            ) : (
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#3b2d5c] bg-[#1e1b33] font-mono text-xs font-bold text-purple-400">
+                {card.card.keyword}
+              </span>
+            )}
+
+            <span className="min-w-0 flex-1 truncate text-sm font-semibold text-purple-400">
+              {card.card.keyword}
+            </span>
+
+            <span className="flex items-center gap-1 font-mono text-xs text-[#64ffda]">
+              <AiFillHeart />
+              {likes}
+            </span>
+
+            <Link
+              href={`/video/${card.video.videoId}`}
+              className="text-periwinkle-gray-500 font-mono text-xs whitespace-nowrap hover:text-purple-400"
             >
-            {card.card.url && <Image src={card.card.url} height={50} width={50} alt="url" className="shrink-0" />}
-            <h1 className="mx-2 text-purple-400">{card.card.keyword}</h1>
-            <h1 className="mx-2">{card.minute}</h1>
-            <Link href={`/video/${card.video.videoId}`} className="text-blue-400 mx-2 underline underline-offset-2">{card.timestamp}</Link>
-            <Image src={thumbnail} height={50} width={80} alt="video" className="hidden" />
-            </div>
-          );
-        })}
-  </>
+              {card.timestamp}
+            </Link>
+          </div>
+        );
+      })}
+    </>
   );
 };

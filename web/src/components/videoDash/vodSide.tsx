@@ -4,78 +4,53 @@ import React from "react";
 
 import { ProgressBar, CommentCards, KeywordList } from "@/components";
 import type {
-  Twitch,
   Card,
+  Selection,
   SetCardsFunction,
+  Timestamp,
 } from "@/types/commentCard";
 
+/**
+ * Left column: the VOD's most-typed words on top, and under them the cards of
+ * 30s blocks built from a word or an emote.
+ *
+ * Fixed height beside the player on xl so the two lists scroll independently of
+ * the page; below that the columns stack and it grows with its content.
+ */
 export const VodSide = ({
   videoId,
-  completed,
-  playerRef,
+  indexing,
   cards,
   setCards,
-  player,
+  selected,
+  onSelect,
 }: {
   cards: Card[];
   setCards: SetCardsFunction;
-  player: Twitch | null;
   videoId: number;
-  completed: boolean | undefined;
-  //React 19: useRef<T>(null) yields RefObject<T | null>, so the prop matches.
-  playerRef: React.RefObject<HTMLDivElement | null>;
+  indexing: boolean | undefined;
+  selected: Selection | null;
+  onSelect: (card: Card, timestamp: Timestamp, seek: boolean) => void;
 }) => {
-
-  if (!playerRef.current?.clientWidth) return <h1>hi</h1>;
-
-  const x = playerRef.current.clientHeight - 0;
-  // const getComments = api.comment.getComments.useMutation({
-  //   onSuccess: () => console.log("success"),
-  // });
-  // const deleteAll = api.video.deleteAll.useMutation({
-  //   onSuccess: () => console.log("success"),
-  // });
-
-  // const checkDupe = api.comment.fetch.useMutation({
-  //   onSuccess: () => console.log("success"),
-  // });
-
- 
   return (
-    <div
-      style={{ "--vod-h": `${x}px` } as React.CSSProperties}
-      className={`scrollbar-x relative mt-2 h-[60vh] w-full min-w-0 overflow-y-scroll rounded-lg bg-slate-700 text-center xl:col-start-10 xl:col-end-13 xl:row-span-full xl:mt-0 xl:h-[var(--vod-h)]`}
-    >
-      {completed && <ProgressBar videoId={videoId} />}
+    <section className="flex flex-col overflow-hidden rounded-xl border border-slate-900 bg-slate-800 xl:h-180">
+      <div className="border-b border-slate-900 px-4 py-3">
+        <h2 className="text-periwinkle-gray-500 font-mono text-xs tracking-[.14em]">
+          TIMESTAMPS
+        </h2>
+        <p className="text-periwinkle-gray-900 text-xs">
+          30s blocks, ranked by hype
+        </p>
+      </div>
+
+      {indexing && <ProgressBar videoId={videoId} />}
       <KeywordList videoId={videoId} cards={cards} setCards={setCards} />
       <CommentCards
-        playerRef={playerRef}
         cards={cards}
         setCards={setCards}
-        videoId={videoId}
-        player={player}
+        selected={selected}
+        onSelect={onSelect}
       />
-            {/* <button
-        onClick={() => deleteAll.mutate({ videoId: videoId })}
-        className=" bg-black px-2 text-white"
-      >
-        Delete Comments
-      </button>
-      <button
-        className=" bg-black px-2 text-white"
-        onClick={() =>
-          getComments.mutate({ videoId: videoId, keyword: "lul", interval: 5 })
-        }
-      >
-        Get Commesdfgsdfgnts
-      </button>
-
-      <button
-        className=" bg-black px-2 text-white"
-        onClick={() => checkDupe.mutate({ videoId: videoId })}
-      >
-        Check dupe
-      </button> */}
-    </div>
+    </section>
   );
 };

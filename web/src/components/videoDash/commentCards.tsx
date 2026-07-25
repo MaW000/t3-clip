@@ -1,97 +1,66 @@
 "use client";
 
-import type { Twitch, Card, SetCardsFunction } from "@/types/commentCard";
-import { CardEle, Timestamps, Comments, TimestampFilter } from "./Cards";
+import type {
+  Card,
+  Selection,
+  SetCardsFunction,
+  Timestamp,
+} from "@/types/commentCard";
+import { CardEle, Timestamps, TimestampFilter } from "./Cards";
+
+/**
+ * The scrolling list of cards inside the timestamps panel. A card is open when
+ * its timestamps have been fetched, so the expanded half is driven by the data
+ * rather than by a second flag.
+ */
 export const CommentCards = ({
-  playerRef,
   cards,
   setCards,
-  player,
+  selected,
+  onSelect,
 }: {
-  player: Twitch | null;
-  videoId: number;
   cards: Card[];
   setCards: SetCardsFunction;
-  playerRef: React.RefObject<HTMLDivElement | null>;
+  selected: Selection | null;
+  onSelect: (card: Card, timestamp: Timestamp, seek: boolean) => void;
 }) => {
-  if (!playerRef.current?.clientWidth) return <h1>Loading...</h1>;
+  if (!cards.length) {
+    return (
+      <div className="flex flex-1 items-center justify-center px-8 py-10 text-center">
+        <p className="text-periwinkle-gray-900 text-[13px] leading-relaxed text-pretty">
+          Pick a word above or an emote below the player to build a card of
+          timestamps.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="my-2 mx-2 flex  flex-col gap-2 md:ml-0 md:mr-2 ">
-      {cards?.map((card: Card) => {
-        //word cards carry no image, unlike emote cards. This used to skip any
-        //card without a url, which would have hidden every keyword card.
-        if (!card.timestamps) {
-          return (
-            <CardEle
-              toggle={true}
-              key={card.id}
-              card={card}
-              cards={cards}
-              setCards={setCards}
-            />
-          );
-        } else {
-          return (
-            <div key={card.id}>
-              <CardEle
-                toggle={false}
-                key={card.id}
-                card={card}
-                cards={cards}
-                setCards={setCards}
-              />
-              <div className="scrollbar-x max-h-96 overflow-y-scroll rounded-b-xl bg-slate-900">
-                <TimestampFilter
-                  timestamps={card.timestamps}
-                  cards={cards}
-                  setCards={setCards}
+    <div className="scrollbar-x flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+      {cards.map((card) => (
+        <div
+          key={card.id}
+          className="shrink-0 overflow-hidden rounded-[10px] border border-[#172033] bg-slate-900"
+        >
+          <CardEle card={card} setCards={setCards} />
+
+          {card.timestamps && (
+            <div className="border-t border-[#172033]">
+              <TimestampFilter card={card} setCards={setCards} />
+              {card.timestamps.map((timestamp) => (
+                <Timestamps
+                  key={timestamp.id}
                   card={card}
+                  timestamp={timestamp}
+                  setCards={setCards}
+                  selected={selected?.tsId === timestamp.id}
+                  onSelect={onSelect}
                 />
-                {card.timestamps?.map((timestamp) => {
-                  if (!timestamp.messages) {
-                    return (
-                      <Timestamps
-                        hide={true}
-                        timestamp={timestamp}
-                        key={timestamp.id}
-                        cards={cards}
-                        setCards={setCards}
-                        player={player}
-                        card={card}
-                      />
-                    );
-                  } else {
-                    return (
-                      <div
-                        key={timestamp.id}
-                        className=" border border-slate-600 py-1 text-periwinkle-gray-500"
-                      >
-                        <Timestamps
-                          hide={false}
-                          timestamp={timestamp}
-                          key={timestamp.id}
-                          cards={cards}
-                          setCards={setCards}
-                          player={player}
-                          card={card}
-                        />
-                        <div className="-mt-2 border-t-4 border-slate-800">
-                          {timestamp.messages.map((message) => {
-                            return (
-                              <Comments message={message} key={message.id} />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  }
-                })}
-              </div>
+              ))}
             </div>
-          );
-        }
-      })}
+          )}
+        </div>
+      ))}
     </div>
   );
 };

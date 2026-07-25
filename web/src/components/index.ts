@@ -10,6 +10,7 @@ export { EmoteCarousel } from "./videoDash/emoteCarousel";
 export { EmoteCards } from "./videoDash/emoteCards";
 export { LikedCards } from "./browse/likedCards";
 export { CommentCards } from "./videoDash/commentCards";
+export { CommentPanel } from "./videoDash/commentPanel";
 export { KeywordList } from "./videoDash/keywordList";
 export { BrowseContent } from "./browse/browseContent";
 export {

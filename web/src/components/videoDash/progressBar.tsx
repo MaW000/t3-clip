@@ -4,7 +4,7 @@ import React from "react";
 import { api } from "@/trpc/react";
 
 /**
- * Indexing progress for a VOD.
+ * Indexing progress for a VOD, at the top of the timestamps panel.
  *
  * The Python worker writes progress to the video_jobs row as it walks the
  * timeline; this just polls that row. No realtime transport involved, so it
@@ -23,19 +23,23 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
         return status === "DONE" || status === "FAILED" ? false : 1000;
       },
       refetchOnWindowFocus: false,
-    }
+    },
   );
 
   if (!data || data.status === "DONE") return null;
 
   if (data.status === "FAILED") {
     return (
-      <div className="mx-auto select-none space-y-3 px-5 pt-10 align-middle">
-        <h1 className="text-2xl text-red-400">Indexing failed</h1>
-        <p className="text-sm text-slate-300">
+      <div className="border-b border-slate-900 px-4 py-3">
+        <h3 className="font-mono text-xs tracking-[.14em] text-red-400">
+          INDEXING FAILED
+        </h3>
+        <p className="text-periwinkle-gray-700 mt-2 text-xs leading-snug text-pretty">
           {data.error ?? "Something went wrong fetching this VOD."}
         </p>
-        <p className="text-xs text-slate-400">Reload the page to try again.</p>
+        <p className="text-periwinkle-gray-900 mt-1 text-xs">
+          Reload the page to try again.
+        </p>
       </div>
     );
   }
@@ -43,15 +47,22 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
   const percent = Math.min(100, Math.ceil(data.progress));
 
   return (
-    <div className="mx-auto select-none space-y-5 px-5 pt-10 align-middle">
-      <h1 className="-mb-5 text-4xl">{percent}%</h1>
-      <div className="h-10 w-full overflow-hidden rounded-3xl bg-slate-800">
+    <div className="border-b border-slate-900 px-4 py-3">
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-periwinkle-gray-500 font-mono text-xs tracking-[.14em]">
+          INDEXING
+        </h3>
+        <span className="font-mono text-xs text-[#64ffda]">{percent}%</span>
+      </div>
+
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-900">
         <div
           style={{ width: `${percent}%` }}
-          className="z-10 h-10 rounded-3xl bg-black transition-[width] duration-500 ease-out"
+          className="h-1.5 rounded-full bg-purple-400 transition-[width] duration-500 ease-out"
         />
       </div>
-      <p className="text-sm text-slate-300">
+
+      <p className="text-periwinkle-gray-900 mt-2 text-xs leading-snug text-pretty">
         {data.status === "QUEUED"
           ? "Queued - waiting for a worker to pick this up"
           : `Indexing chat${

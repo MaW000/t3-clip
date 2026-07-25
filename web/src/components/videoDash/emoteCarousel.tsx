@@ -4,6 +4,11 @@ import { api } from "@/trpc/react";
 import { EmoteCards } from "@/components";
 import type { Term } from "@/types/emote";
 import type { SetCardsFunction, Card } from "@/types/commentCard";
+
+/**
+ * The channel's emotes, under the player. Each one builds a card of the blocks
+ * it was typed in, the same flow the most-typed word list uses.
+ */
 export const EmoteCarousel = ({
   videoId,
   setCards,
@@ -22,12 +27,20 @@ export const EmoteCarousel = ({
       refetchInterval: (query) =>
         (query.state.data?.length ?? 0) > 0 ? false : 5000,
       refetchOnWindowFocus: false,
-    }
+    },
   );
   const terms = (a.data ?? []) as Term[];
 
   return (
-    <div className={`mx-0 flex min-w-0 rounded-b-xl bg-slate-600 pb-2 sm:mx-5`} id="container">
+    <div className="overflow-hidden rounded-xl border border-slate-900 bg-slate-800">
+      <div className="flex items-baseline justify-between border-b border-slate-900 px-4 py-3">
+        <h2 className="text-periwinkle-gray-500 font-mono text-xs tracking-[.14em]">
+          CHANNEL EMOTES
+        </h2>
+        <span className="text-periwinkle-gray-900 font-mono text-xs whitespace-nowrap">
+          click to build a card
+        </span>
+      </div>
       <EmoteCards
         terms={terms}
         videoId={videoId}
