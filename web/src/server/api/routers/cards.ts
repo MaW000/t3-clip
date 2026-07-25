@@ -5,12 +5,24 @@ import {
   protectedProcedure,
 } from "@/server/api/trpc";
 
+/**
+ * A card only ever shows its best few blocks, so the cut happens in the query.
+ * A three hour VOD gives a common word hundreds of 30s blocks, and every one of
+ * them used to cross the wire - with its `msgIds`, which is one id per message.
+ */
+const TIMESTAMP_TAKE = 10;
+
+const TIMESTAMP_ORDER = {
+  count: { count: "desc" },
+  likes: { likes: "desc" },
+} as const;
+
 export const cardRouter = createTRPCRouter({
   getCards: publicProcedure
     .input(
       z.object({
         videoId: z.number(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const video = await ctx.db.video.findUnique({
@@ -31,16 +43,33 @@ export const cardRouter = createTRPCRouter({
         },
       });
     }),
+  //the sort is part of the request, not something the client reorders after the
+  //fact: the top 10 by likes is a different ten rows than the top 10 by count,
+  //so flipping the pill has to come back here.
   getCard: publicProcedure
     .input(
       z.object({
         cardId: z.string(),
-      })
+        sort: z.enum(["count", "likes"]),
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       return await ctx.db.commentCard.findMany({
         where: {
           cardId: input.cardId,
+        },
+        orderBy: TIMESTAMP_ORDER[input.sort],
+        take: TIMESTAMP_TAKE,
+        //only the fields the row renders. The rolling like windows are the
+        //browse page's business and msgIds is fetched per block on demand.
+        select: {
+          id: true,
+          cardId: true,
+          timestamp: true,
+          contentOffsetSeconds: true,
+          count: true,
+          likes: true,
+          liked: true,
         },
       });
     }),
@@ -49,7 +78,7 @@ export const cardRouter = createTRPCRouter({
       z.object({
         cardId: z.string(),
         timestamp: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const cards = await ctx.db.commentCard.findMany({
@@ -73,7 +102,7 @@ export const cardRouter = createTRPCRouter({
         messages: card.msgIds
           .map((id) => byId.get(id))
           .filter((message): message is (typeof messages)[number] =>
-            Boolean(message)
+            Boolean(message),
           ),
       }));
     }),
@@ -82,7 +111,7 @@ export const cardRouter = createTRPCRouter({
       z.object({
         cardId: z.string(),
         userId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const test = await ctx.db.commentCard.findUnique({
@@ -236,7 +265,7 @@ export const cardRouter = createTRPCRouter({
       z.object({
         cardId: z.string(),
         userId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       const test = await ctx.db.commentCard.findUnique({
@@ -281,7 +310,7 @@ export const cardRouter = createTRPCRouter({
         });
 
         const filteredCards = user?.cardIds?.filter(
-          (id) => id !== input.cardId
+          (id) => id !== input.cardId,
         );
         card = await ctx.db.commentCard.update({
           where: {
@@ -315,7 +344,7 @@ export const cardRouter = createTRPCRouter({
           },
         });
         const filteredCards = user?.cardIds?.filter(
-          (id) => id !== input.cardId
+          (id) => id !== input.cardId,
         );
         card = await ctx.db.commentCard.update({
           where: {

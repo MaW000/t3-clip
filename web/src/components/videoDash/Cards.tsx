@@ -13,6 +13,26 @@ import { useSession } from "next-auth/react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 /**
+ * Opening a card and flipping which column ranks it are the same request. The
+ * server hands back only the top blocks, so a different sort is a different set
+ * of rows rather than a reorder of the ones already here.
+ */
+const useTimestamps = (setCards: SetCardsFunction) =>
+  api.card.getCard.useMutation({
+    //keyed off the request rather than the response, so a card that comes back
+    //with nothing still opens instead of silently doing nothing
+    onSuccess: (data, variables) => {
+      setCards((prev) =>
+        prev.map((c): Card =>
+          c.id === variables.cardId
+            ? { ...c, timestamps: data, sort: variables.sort }
+            : c,
+        ),
+      );
+    },
+  });
+
+/**
  * The head of a card: what it was built from, and the spread of message counts
  * across its blocks. Clicking it fetches the timestamps, or drops them again.
  */
@@ -23,17 +43,7 @@ export const CardEle = ({
   card: Card;
   setCards: SetCardsFunction;
 }) => {
-  const getTimestamps = api.card.getCard.useMutation({
-    onSuccess: (data) => {
-      const first = data[0];
-      if (!first) return;
-      setCards((prev) =>
-        prev.map((c): Card =>
-          c.id === first.cardId ? { ...c, timestamps: data, sort: "time" } : c,
-        ),
-      );
-    },
-  });
+  const getTimestamps = useTimestamps(setCards);
 
   const open = !!card.timestamps;
 
@@ -45,7 +55,7 @@ export const CardEle = ({
         ),
       );
     } else {
-      getTimestamps.mutate({ cardId: card.id });
+      getTimestamps.mutate({ cardId: card.id, sort: card.sort ?? "count" });
     }
   };
 
@@ -226,15 +236,14 @@ export const Comments = ({ message }: { message: Message }) => {
 };
 
 const SORTS: { key: SortMode; label: string }[] = [
-  { key: "time", label: "TIME" },
   { key: "count", label: "COUNT" },
   { key: "likes", label: "LIKES" },
 ];
 
 /**
- * Reorders a card's blocks. Sorting is done on the copy held here rather than
- * by refetching, so "time" costs nothing and the other two keep their order
- * when a like lands.
+ * Which column the card's blocks are ranked by. Each pill refetches, because
+ * only the top slice is ever held here - the ten loudest blocks and the ten
+ * most liked are not the same ten rows in a different order.
  */
 export const TimestampFilter = ({
   card,
@@ -243,34 +252,22 @@ export const TimestampFilter = ({
   card: Card;
   setCards: SetCardsFunction;
 }) => {
-  const active = card.sort ?? "time";
-
-  const sortBy = (mode: SortMode) => {
-    setCards((prev) =>
-      prev.map((c): Card => {
-        if (c.id !== card.id || !c.timestamps) return c;
-        const timestamps = [...c.timestamps].sort((a, b) =>
-          mode === "time"
-            ? a.contentOffsetSeconds - b.contentOffsetSeconds
-            : mode === "likes"
-              ? b.likes - a.likes
-              : b.count - a.count,
-        );
-        return { ...c, timestamps, sort: mode };
-      }),
-    );
-  };
+  const getTimestamps = useTimestamps(setCards);
+  const active = card.sort ?? "count";
 
   return (
     <div className="flex flex-wrap gap-1 p-2">
       {SORTS.map((sort) => (
         <button
           key={sort.key}
-          onClick={() => sortBy(sort.key)}
-          className={`cursor-pointer rounded-full border border-[#24304a] px-[7px] py-[3px] font-mono text-[10px] ${
+          disabled={getTimestamps.isPending || sort.key === active}
+          onClick={() =>
+            getTimestamps.mutate({ cardId: card.id, sort: sort.key })
+          }
+          className={`rounded-full border border-[#24304a] px-[7px] py-[3px] font-mono text-[10px] ${
             active === sort.key
               ? "bg-purple-600 text-white"
-              : "text-periwinkle-gray-700 hover:text-periwinkle-gray-400"
+              : "text-periwinkle-gray-700 hover:text-periwinkle-gray-400 cursor-pointer disabled:opacity-50"
           }`}
         >
           {sort.label}

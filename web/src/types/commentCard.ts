@@ -8,8 +8,9 @@ export interface Twitch {
 //still type-check.
 export type SetCardsFunction = Dispatch<SetStateAction<Card[]>>;
 
-//which column of the timestamp list the sort pills are currently ordering by
-export type SortMode = "time" | "count" | "likes";
+//which column the server ranks a card's blocks by. Count is the default - the
+//panel exists to surface the hypest blocks, not to walk the VOD in order.
+export type SortMode = "count" | "likes";
 
 //the timestamp block whose chat is showing in the comments panel
 export interface Selection {
@@ -32,6 +33,8 @@ export interface Card {
   //client-only: cards come off the database without one
   sort?: SortMode;
 }
+//mirrors the `select` in card.getCard - the columns a row actually draws. It
+//used to be the whole commentCard row, msgIds and rolling like windows included.
 export interface Timestamp {
   id: string;
   timestamp: string;
@@ -39,8 +42,6 @@ export interface Timestamp {
   contentOffsetSeconds: number;
   count: number;
   cardId: string;
-  vidId: string;
-  msgIds: string[];
   liked: string[];
   messages?: Message[] | null;
 }
