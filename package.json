@@ -1,0 +1,19 @@
+{
+  "name": "t3-clip",
+  "private": true,
+  "description": "Repo-root task runner. The deployable apps are web/ (Vercel) and worker/ (Railway); neither is a workspace of this package, so their installs and lockfiles stay independent.",
+  "scripts": {
+    "dev": "concurrently -n web,worker -c cyan,magenta -k \"npm:dev:web\" \"npm:dev:worker\"",
+    "dev:web": "npm --prefix web run dev",
+    "dev:worker": "bash scripts/dev-worker.sh",
+    "build": "npm --prefix web run build",
+    "typecheck": "npm --prefix web run typecheck",
+    "lint": "npm --prefix web run lint",
+    "db:push": "npm --prefix web exec -- prisma db push",
+    "db:studio": "npm --prefix web exec -- prisma studio",
+    "setup": "npm install && npm --prefix web install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

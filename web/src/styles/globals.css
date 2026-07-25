@@ -100,6 +100,30 @@ body {
   color: var(--color-periwinkle-gray-500);
 }
 
+/*
+ * Tailwind 4's preflight strips the browser default border and makes form
+ * controls transparent, which left the search inputs as invisible boxes with
+ * black text on the dark gradient. This is the shared field look - callers add
+ * their own rounding, since the header input sits flush inside a button group.
+ */
+@utility field {
+  background-color: #1f2030;
+  color: #ffffff;
+  border: 1px solid var(--color-periwinkle-gray-800);
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+
+  &::placeholder {
+    color: var(--color-periwinkle-gray-900);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-purple-400);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--color-purple-400) 40%, transparent);
+  }
+}
+
 .labelCardsH {
   position: absolute;
   bottom: calc(var(--spacing) * -7);

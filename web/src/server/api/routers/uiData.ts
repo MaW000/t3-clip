@@ -1,4 +1,16 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+
+/**
+ * These queries `include: { video: true }`, so the BIGINT videoId column comes
+ * back as `bigint`. The client-side `Comment` interface in types/ui.ts types it
+ * as `number`, so it is narrowed here rather than at every call site. See the
+ * video router for the reasoning.
+ */
+const toClientCard = <T extends { video: { videoId: bigint } }>(card: T) => ({
+  ...card,
+  video: { ...card.video, videoId: Number(card.video.videoId) },
+});
+
 export const uiRouter = createTRPCRouter({
   getTopUsers: publicProcedure.query(async ({ ctx }) => {
     const users = await ctx.db.user.findMany({
@@ -84,10 +96,10 @@ export const uiRouter = createTRPCRouter({
     ]);
 
     return {
-      top20CardsBySecond,
-      top20CardsByWeek,
-      top20CardsByMinute,
-      top20CardsByDay,
+      top20CardsBySecond: top20CardsBySecond.map(toClientCard),
+      top20CardsByWeek: top20CardsByWeek.map(toClientCard),
+      top20CardsByMinute: top20CardsByMinute.map(toClientCard),
+      top20CardsByDay: top20CardsByDay.map(toClientCard),
     };
   }),
 });

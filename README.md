@@ -43,16 +43,35 @@ details and Railway setup.
 # Setup
 
 ```bash
-cd web
-npm install
-cp .env.example .env      # fill in DATABASE_URL, AUTH_SECRET, GOOGLE_CLIENT_*
-npx prisma db push        # creates the tables, including video_jobs
-npm run dev
+npm run setup                        # installs the root runner + web/
+cp web/.env.example web/.env         # DATABASE_URL, AUTH_SECRET, GOOGLE_CLIENT_*
+cp worker/.env.example worker/.env   # the same DATABASE_URL
+npm run db:push                      # creates the tables, including video_jobs
+npm run dev                          # starts both
 ```
 
-Then start the worker (see [`worker/README.md`](worker/README.md)) pointed at the
-same `DATABASE_URL`. Without it, videos will sit at 0% forever — the web app
-enqueues but never indexes.
+`npm run dev` brings up the Next.js app on
+[localhost:3000](http://localhost:3000) and the Python worker together, with
+their output interleaved and tagged `[web]` / `[worker]`. Ctrl-C stops both.
+
+The worker's virtualenv is built on first run by
+[`scripts/dev-worker.sh`](scripts/dev-worker.sh), using [uv](https://docs.astral.sh/uv/)
+if it is installed and `python3 -m venv` otherwise. Nothing to set up by hand.
+
+| Command | Does |
+| --- | --- |
+| `npm run dev` | Both apps |
+| `npm run dev:web` | Next.js only |
+| `npm run dev:worker` | Worker only |
+| `npm run build` | Production build of `web/` |
+| `npm run db:push` | Push the Prisma schema |
+| `npm run db:studio` | Prisma Studio |
+
+The root `package.json` is only a task runner — `web/` and `worker/` are not
+workspaces of it, so their installs, lockfiles and deploys stay independent.
+
+Without the worker running, videos sit at 0% forever: the web app enqueues but
+never indexes. See [`worker/README.md`](worker/README.md) for the ingest details.
 
 ## Vercel
 

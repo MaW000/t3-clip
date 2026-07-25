@@ -29,8 +29,11 @@ enum JobStatus {
 /// The work queue. One row per Twitch VOD we have been asked to index.
 /// The progress bar in the web app is rendered straight off this row.
 model VideoJob {
-    id      String    @id @default(cuid())
-    videoId Int       @unique
+    id String @id @default(cuid())
+    /// Twitch VOD id. BigInt, not Int: ids passed 2^31 in 2026, so INT4 rejects
+    /// every current VOD with "Unable to fit integer value into an INT4".
+    /// The tRPC layer converts to and from `number` - see the video router.
+    videoId BigInt    @unique
     status  JobStatus @default(QUEUED)
 
     /// 0-100. Written by the worker as it walks the VOD timeline.
@@ -117,9 +120,10 @@ model Emote {
 }
 
 model Video {
-    id           String        @id @default(cuid())
-    channelId    String
-    videoId      Int           @unique
+    id        String @id @default(cuid())
+    channelId String
+    /// See VideoJob.videoId - BigInt for the same reason.
+    videoId      BigInt        @unique
     url          String
     description  String
     duration     String

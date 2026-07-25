@@ -40,6 +40,8 @@ class _State:
     seen: set[str] = field(default_factory=set)
     buffer: list[dict[str, Any]] = field(default_factory=list)
     inserted: int = 0
+    #seconds too dense to page through - see _walk
+    unreachable_seconds: int = 0
 
     def progress(self) -> float:
         if self.total_span <= 0:
@@ -128,6 +130,14 @@ class Ingestor:
 
             await self._flush(video_db_id, state)
 
+            if state.unreachable_seconds:
+                log.warning(
+                    "video %s indexed with %d second(s) that could not be fully "
+                    "paged - the comment count is a floor, not a total",
+                    video_id,
+                    state.unreachable_seconds,
+                )
+
             if not shutdown.is_set():
                 await self._db_call(self.db.mark_video_complete, video_db_id)
 
@@ -197,13 +207,35 @@ class Ingestor:
             if len(state.buffer) >= self.config.batch_size:
                 await self._flush(state.video_db_id, state)
 
-            last_offset = max(
-                comment["contentOffsetSeconds"] for comment in page
-            )
-            #a page can be entirely inside one second on a busy VOD. Forcing at
-            #least one second of movement trades a few dropped comments in that
-            #second for a guarantee the walk terminates.
-            offset = last_offset if last_offset > offset else offset + 1
+            page_offsets = [comment["contentOffsetSeconds"] for comment in page]
+            last_offset = max(page_offsets)
+
+            if last_offset > offset:
+                offset = last_offset
+            else:
+                #The page did not move us forward. Normally harmless: it means
+                #we re-fetched the page we just walked (Twitch returns the same
+                #fixed page for any offset inside it), so stepping one second
+                #past its end lands on the next page and nothing is missed.
+                #
+                #The exception is a page whose comments all share one second.
+                #Then the next page for that second is unreachable - Twitch
+                #rejects cursor paging with an integrity check and will not
+                #accept a fractional contentOffsetSeconds. Measured against live
+                #VODs pages span at least three seconds, so this should never
+                #fire; if it does, the comment count is short and it says so
+                #rather than silently under-indexing.
+                if min(page_offsets) == last_offset:
+                    log.warning(
+                        "video %s: second %d fills an entire page (%d comments) "
+                        "- any beyond it cannot be reached by offset paging",
+                        video_id,
+                        last_offset,
+                        len(page),
+                    )
+                    state.unreachable_seconds += 1
+                offset = offset + 1
+
             state.positions[index] = min(offset, end)
 
         state.positions[index] = end

@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
+import { parseVodId } from "@/lib/vodId";
 export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
   const { data: sessionData } = useSession();
 
@@ -13,12 +15,15 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
   const router = useRouter();
 
   function handleUrl() {
-    const matches = url.match(/\d+/g);
-    if (matches === null) {
-      setError("Please enter a valid VideoID");
-    } else if (matches[0].length === 10) {
-      router.push(`/video/${matches[0]}`);
+    const videoId = parseVodId(url);
+
+    if (videoId === null) {
+      setError("Please enter a valid Twitch VOD url or id");
+      return;
     }
+
+    setError("");
+    router.push(`/video/${videoId}`);
   }
   const name = sessionData?.user?.name?.split(' ')
   return (
@@ -37,7 +42,7 @@ export const HeaderMain = ({ toggleSearch }: { toggleSearch: boolean }) => {
           <div className="absolute bottom-1  left-1/2 flex h-1 w-1/2 -translate-x-1/2  items-center justify-center bg-purple-400" />
         </Link>
         <input
-          className="h-12 w-full min-w-0 flex-1 py-2 indent-2 text-base leading-none md:text-xl"
+          className="field h-12 w-full min-w-0 flex-1 text-base leading-none md:text-xl"
           placeholder="Vod url / Id"
           onChange={(e) => setUrl(e.target.value)}
         />

@@ -15,7 +15,8 @@ export const cardRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const video = await ctx.db.video.findUnique({
         where: {
-          videoId: input.videoId,
+          //BIGINT column - see the video router for why the input stays a number
+          videoId: BigInt(input.videoId),
         },
         select: {
           id: true,

@@ -17,7 +17,8 @@ export const commentRouter = createTRPCRouter({
             if (!input.videoId) return;
 
             const videoId = await ctx.db.video.findUnique({
-                where: { videoId: input.videoId },
+                //BIGINT column - see the video router for why the input stays a number
+                where: { videoId: BigInt(input.videoId) },
                 select: { id: true, channelId: true },
             });
             if (!videoId) return;

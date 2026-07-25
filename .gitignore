@@ -3,6 +3,9 @@
 # Repo root only. The Next.js app has its own .gitignore in web/, which covers
 # node_modules, .next, next-env.d.ts and the generated Prisma client.
 
+# root task runner (concurrently); the apps install their own deps
+/node_modules
+
 # misc
 .DS_Store
 *.pem

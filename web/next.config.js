@@ -2,11 +2,21 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
+
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+
+  /**
+   * There is a package.json at the repo root too (the dev task runner), so Next
+   * would otherwise walk up, find two lockfiles and guess at the workspace root.
+   * This app is self-contained - pin tracing to this directory.
+   */
+  outputFileTracingRoot: dirname(fileURLToPath(import.meta.url)),
 
   /**
    * Thumbnails, emotes and avatars are all hot-linked from third parties, so

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Script from "next/script";
 
 import { VideoDash, HeaderMain } from "@/components";
+import { api } from "@/trpc/react";
 
 /**
  * Client half of the video route.
@@ -14,6 +15,12 @@ import { VideoDash, HeaderMain } from "@/components";
  */
 export const VideoPageView = ({ videoId }: { videoId: number }) => {
   const [toggle, setToggle] = useState(false);
+
+  //Queues the VOD for indexing. This used to live inside VideoDash, which only
+  //mounts once the embed script above calls onReady - so a blocked or slow
+  //script meant the job was never created and the VOD silently never indexed.
+  //Nothing gates it here.
+  const { data: indexing } = api.video.getVideo.useQuery({ videoId });
 
   return (
     <>
@@ -26,7 +33,7 @@ export const VideoPageView = ({ videoId }: { videoId: number }) => {
       />
       <main className="min-h-screen ">
         <HeaderMain toggleSearch={true} />
-        {toggle && <VideoDash videoId={videoId} />}
+        {toggle && <VideoDash videoId={videoId} indexing={indexing} />}
       </main>
     </>
   );

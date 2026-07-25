@@ -10,7 +10,20 @@ import {
  *
  * The web app's only job is to put a row on the queue and then read progress
  * back off the database. Nothing in this router talks to Twitch.
+ *
+ * `videoId` is BIGINT in the database because Twitch VOD ids outgrew INT4, so
+ * Prisma types it as `bigint`. Every VOD id is far below Number.MAX_SAFE_INTEGER
+ * though, so the tRPC surface stays `number` and the two conversions below are
+ * the only place the distinction exists. Letting `bigint` escape would retype
+ * every component prop and the hand-written `Comment` interface in types/ui.ts.
  */
+const videoIdInput = z.object({ videoId: z.number().int().positive() });
+
+const toClientVideo = <T extends { videoId: bigint }>(video: T) => ({
+  ...video,
+  videoId: Number(video.videoId),
+});
+
 export const videoRouter = createTRPCRouter({
   /**
    * Called when a video page mounts. Enqueues the VOD for indexing if it is not
@@ -20,26 +33,30 @@ export const videoRouter = createTRPCRouter({
    * fully indexed. Safe to call repeatedly - it will not disturb a running job.
    */
   getVideo: publicProcedure
-    .input(z.object({ videoId: z.number() }))
+    .input(videoIdInput)
     .query(async ({ input, ctx }) => {
+      const videoId = BigInt(input.videoId);
+
       const video = await ctx.db.video.findUnique({
-        where: { videoId: input.videoId },
+        where: { videoId },
         select: { complete: true },
       });
       if (video?.complete) return false;
 
-      const job = await ctx.db.videoJob.findUnique({
-        where: { videoId: input.videoId },
-      });
+      const job = await ctx.db.videoJob.findUnique({ where: { videoId } });
 
       if (!job) {
-        await ctx.db.videoJob.create({
-          data: { videoId: input.videoId },
+        //upsert rather than create: this now runs the moment the route mounts,
+        //so two tabs opening the same VOD would otherwise race the unique index
+        await ctx.db.videoJob.upsert({
+          where: { videoId },
+          create: { videoId },
+          update: {},
         });
       } else if (job.status === "FAILED") {
         //let the user retry a failed job by revisiting the page
         await ctx.db.videoJob.update({
-          where: { videoId: input.videoId },
+          where: { videoId },
           data: { status: "QUEUED", progress: 0, error: null },
         });
       }
@@ -52,10 +69,12 @@ export const videoRouter = createTRPCRouter({
    * updates, so there is no realtime transport involved.
    */
   getProgress: publicProcedure
-    .input(z.object({ videoId: z.number() }))
+    .input(videoIdInput)
     .query(async ({ input, ctx }) => {
+      const videoId = BigInt(input.videoId);
+
       const job = await ctx.db.videoJob.findUnique({
-        where: { videoId: input.videoId },
+        where: { videoId },
         select: {
           status: true,
           progress: true,
@@ -72,7 +91,7 @@ export const videoRouter = createTRPCRouter({
         //no queue row means either nothing asked for it yet, or it finished and
         //the row was cleaned up. Fall back to the video itself.
         const video = await ctx.db.video.findUnique({
-          where: { videoId: input.videoId },
+          where: { videoId },
           select: { complete: true, title: true, streamer: true },
         });
         return {
@@ -93,7 +112,7 @@ export const videoRouter = createTRPCRouter({
     }),
 
   getFive: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.video.findMany({
+    const videos = await ctx.db.video.findMany({
       select: {
         title: true,
         streamer: true,
@@ -109,10 +128,11 @@ export const videoRouter = createTRPCRouter({
       },
       take: 5,
     });
+    return videos.map(toClientVideo);
   }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.video.findMany({
+    const videos = await ctx.db.video.findMany({
       select: {
         title: true,
         streamer: true,
@@ -127,10 +147,11 @@ export const videoRouter = createTRPCRouter({
         likes: "desc",
       },
     });
+    return videos.map(toClientVideo);
   }),
 
   deleteAll: publicProcedure
-    .input(z.object({ videoId: z.number() }))
+    .input(videoIdInput)
     .mutation(async ({ ctx, input }) => {
       //order matters, children before parents
       await ctx.db.msg.deleteMany({});

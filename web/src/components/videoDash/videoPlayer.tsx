@@ -20,10 +20,16 @@ interface PlayerOptions {
 interface MyWindow extends Window {
   Twitch?: TwitchObject;
 }
-export const VideoDash = ({ videoId }: { videoId: number }) => {
+//`indexing` is owned by VideoPageView so the job is queued whether or not the
+//Twitch embed script ever loads.
+export const VideoDash = ({
+  videoId,
+  indexing,
+}: {
+  videoId: number;
+  indexing: boolean | undefined;
+}) => {
   const playerRef = useRef<HTMLDivElement>(null);
-  const videoSaveRes = api.video.getVideo.useQuery({ videoId: videoId });
-  const response = videoSaveRes.data;
   const [player, setPlayer] = useState<Twitch | null>(null);
   const [cards, setCards] = useState<Card[]>([]);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -104,7 +110,7 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
           player={player}
           playerRef={playerRef}
           videoId={videoId}
-          completed={response}
+          completed={indexing}
         />
       </div>
       <div>

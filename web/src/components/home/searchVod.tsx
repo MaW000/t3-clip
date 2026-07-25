@@ -3,20 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { parseVodId } from "@/lib/vodId";
+
 export const SearchVod = ({ ...props }) => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
   function handleUrl() {
-    const matches = url.match(/\d+/g);
+    const videoId = parseVodId(url);
 
-    if (matches === null) {
-      setError("Please enter a valid VideoID");
-    } else {
-      if (matches[0].length === 10) {
-        router.push(`/video/${matches[0]}`);
-      }
+    if (videoId === null) {
+      setError("Please enter a valid Twitch VOD url or id");
+      return;
     }
+
+    setError("");
+    router.push(`/video/${videoId}`);
   }
 
   return (
@@ -37,7 +39,7 @@ export const SearchVod = ({ ...props }) => {
         <input
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://www.twitch.tv/videos/1749256306"
-          className="w-full max-w-full text-base sm:w-[30rem] sm:text-lg"
+          className="field w-full max-w-full rounded-lg text-base sm:w-[30rem] sm:text-lg"
         />
         {error && (
           <div
