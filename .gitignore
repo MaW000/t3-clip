@@ -1,24 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# database
-/prisma/db.sqlite
-/prisma/db.sqlite-journal
-
-# next.js
-/.next/
-/out/
-next-env.d.ts
-
-# production
-/build
+#
+# Repo root only. The Next.js app has its own .gitignore in web/, which covers
+# node_modules, .next, next-env.d.ts and the generated Prisma client.
 
 # misc
 .DS_Store
@@ -37,9 +20,6 @@ yarn-error.log*
 
 # vercel
 .vercel
-
-# typescript
-*.tsbuildinfo
 
 # Python worker
 worker/__pycache__/
