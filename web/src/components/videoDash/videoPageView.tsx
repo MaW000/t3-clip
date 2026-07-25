@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 
 import { VideoDash, HeaderMain } from "@/components";
@@ -21,6 +21,34 @@ export const VideoPageView = ({ videoId }: { videoId: number }) => {
   //script meant the job was never created and the VOD silently never indexed.
   //Nothing gates it here.
   const { data: indexing } = api.video.getVideo.useQuery({ videoId });
+
+  //The sidebar queries run once on mount, which is before the worker has
+  //written anything, so their results used to stay empty until a manual
+  //reload. Watching the job status here and invalidating on each transition
+  //makes them refetch as the data actually lands. Same query key as the
+  //progress bar, so React Query shares one request rather than polling twice.
+  const utils = api.useUtils();
+  const { data: job } = api.video.getProgress.useQuery(
+    { videoId },
+    {
+      refetchInterval: (query) => {
+        const status = query.state.data?.status;
+        return status === "DONE" || status === "FAILED" ? false : 1000;
+      },
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  const status = job?.status;
+  const lastStatus = useRef<typeof status>(undefined);
+
+  useEffect(() => {
+    if (!status || status === lastStatus.current) return;
+    lastStatus.current = status;
+
+    void utils.emote.getComments.invalidate({ videoId });
+    void utils.card.getCards.invalidate({ videoId });
+  }, [status, videoId, utils]);
 
   return (
     <>

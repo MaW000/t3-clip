@@ -18,7 +18,8 @@ from typing import Any
 from config import Config
 from db import Database
 from emotes import EmoteCollector
-from twitch import TwitchClient
+from twitch import TwitchClient, TwitchError
+from words import WordCounter, looks_like_emote, normalise
 
 log = logging.getLogger(__name__)
 
@@ -117,7 +118,18 @@ class Ingestor:
             try:
                 await asyncio.gather(
                     *(
-                        self._walk(client, video_id, index, start, end, state, shutdown)
+                        self._walk(
+                            client,
+                            video_id,
+                            index,
+                            start,
+                            end,
+                            state,
+                            shutdown,
+                            #chat outlives the VOD's reported length, so the
+                            #final segment keeps going past its end
+                            is_tail=index == len(chunks) - 1,
+                        )
                         for index, (start, end) in enumerate(chunks)
                     )
                 )
@@ -139,10 +151,61 @@ class Ingestor:
                 )
 
             if not shutdown.is_set():
+                await self._count_words(video_db_id, channel_id)
                 await self._db_call(self.db.mark_video_complete, video_db_id)
 
             total = await self._db_call(self.db.count_comments, video_db_id)
             return total
+
+    async def _count_words(self, video_db_id: str, channel_id: str) -> None:
+        """Store the VOD's most-typed words.
+
+        Counted from the stored messages rather than from the walk, because a
+        retried job skips comments it already has - streaming the counter off
+        the pages would leave a resumed run counting only the new ones.
+
+        Best-effort: the VOD is fully indexed by this point, so a failure here
+        should not fail the job and re-fetch every comment.
+        """
+        try:
+            counter = WordCounter()
+
+            def build() -> WordCounter:
+                for message in self.db.iter_messages(video_db_id):
+                    counter.add(message)
+                return counter
+
+            await self._db_call(build)
+
+            emotes = await self._db_call(self.db.emote_names, channel_id)
+
+            #Real emotes have their own carousel, so they are kept out of the
+            #word list. Plain words and slang that a channel happens to register
+            #as emotes ("LOL", "LUL", "WW") stay - they are words, and folding
+            #their spellings together is the whole point of this list.
+            #
+            #The decision is per group, not per name: several emote names
+            #normalise to one key, and BTTV's mixed-case "LuL" reads as a real
+            #emote while aliasing straight into "lol". Judging names one at a
+            #time let that single entry delete the whole "lol" group. A group is
+            #only dropped when every emote behind it is a genuine emote.
+            names_by_key: dict[str, list[str]] = {}
+            for name in emotes:
+                names_by_key.setdefault(normalise(name.lower()), []).append(name)
+
+            exclude = {
+                key
+                for key, names in names_by_key.items()
+                if all(looks_like_emote(name) for name in names)
+            }
+            if self.config.keyword_exclude_emotes:
+                exclude = set(names_by_key)
+
+            rows = counter.top(self.config.keyword_limit, exclude=exclude)
+            await self._db_call(self.db.replace_keywords, video_db_id, rows)
+            log.info("stored %d keywords for video %s", len(rows), video_db_id)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("word count failed for video %s: %s", video_db_id, exc)
 
     async def _collect_emotes(self, channel_id: str, meta: dict[str, Any]) -> None:
         """Store the channel's emotes and chat term counts.
@@ -184,12 +247,34 @@ class Ingestor:
         end: int,
         state: _State,
         shutdown: asyncio.Event,
+        *,
+        is_tail: bool = False,
     ) -> None:
-        """Walk one timeline segment forward, a page at a time."""
-        offset = start
+        """Walk one timeline segment forward, a page at a time.
 
-        while offset < end and not shutdown.is_set():
-            page = await client.fetch_comments(video_id, offset)
+        The tail segment ignores `end`. A VOD's lengthSeconds is where the video
+        stops, not where chat stops - messages keep landing for several seconds
+        afterwards, and stopping at `end` left every VOD short by that tail.
+        Interior segments do not need this: the next segment starts at exactly
+        this one's `end` and re-fetches the page straddling the boundary.
+        """
+        offset = start
+        barren = 0
+
+        while not shutdown.is_set():
+            if offset >= end and not is_tail:
+                break
+
+            try:
+                page = await client.fetch_comments(video_id, offset)
+            except TwitchError:
+                #past the last comment Twitch answers with a generic "service
+                #error" rather than an empty page, so for the tail this is the
+                #end of chat. Anywhere else it is a real failure.
+                if is_tail and offset >= end:
+                    break
+                raise
+
             if not page:
                 #nothing left at or after this offset
                 break
@@ -202,6 +287,14 @@ class Ingestor:
             for comment in fresh:
                 state.seen.add(comment["commentId"])
             state.buffer.extend(fresh)
+
+            #Termination guard for the tail, which has no `end` to stop it. The
+            #expected exit is the service error above; this catches a Twitch
+            #that keeps handing back the same final page instead.
+            if is_tail and offset >= end:
+                barren = 0 if fresh else barren + 1
+                if barren >= 3:
+                    break
 
             #flush as we go, otherwise a long VOD buffers millions of rows
             if len(state.buffer) >= self.config.batch_size:
@@ -257,7 +350,7 @@ class Ingestor:
                 )
             except Exception as exc:  # noqa: BLE001 - never kill the run over this
                 log.warning("progress update failed: %s", exc)
-            await asyncio.sleep(3)
+            await asyncio.sleep(self.config.progress_interval)
 
     async def _flush(self, video_db_id: str, state: _State) -> None:
         if not state.buffer:

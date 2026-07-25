@@ -11,8 +11,11 @@ export const commentRouter = createTRPCRouter({
         .input(z.object({ videoId: z.number(), keyword: z.string(), interval: z.number().default(30), }))
         .mutation(async ({ ctx, input }) => {
 
-            function escapeSpecialChars(keyword: string) {
-                return keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            //POSIX ERE metacharacters, for the regex below. The old helper
+            //escaped these for a Prisma `contains` filter, which compiles to a
+            //LIKE - the backslashes were matched literally there.
+            function escapeRegex(value: string) {
+                return value.replace(/[.^$*+?()[\]{}|\\]/g, "\\$&");
             }
             if (!input.videoId) return;
 
@@ -27,49 +30,47 @@ export const commentRouter = createTRPCRouter({
                 where: { vidId: videoId.id, keyword: input.keyword, interval: input.interval },
             })
 
-            const emoteDb = await ctx.db.term.findFirst({
-                where: { term: input.keyword },
-                include: {
-                    Emote: true
+            //already generated - hand back the existing card. Returning
+            //undefined here made a second click on the same word do nothing.
+            if (cardCurr) return cardCurr
 
-                }
+            //A keyword is either one of the VOD's most-typed words or one of the
+            //channel's emotes. The lookup bounds what can be searched to things
+            //we actually computed, and yields the spellings to match on: the
+            //"lol" group has to find "lmao", "lul" and "haha" as well.
+            const word = await ctx.db.keyword.findUnique({
+                where: { vidId_key: { vidId: videoId.id, key: input.keyword } },
+                select: { variants: true },
             })
+            const emoteDb = word
+                ? null
+                : await ctx.db.term.findFirst({
+                    where: { term: input.keyword },
+                    include: { Emote: true },
+                })
 
-            if (cardCurr || !emoteDb) return
+            if (!word && !emoteDb) return
 
+            const variants = word?.variants.length
+                ? word.variants
+                : [input.keyword]
 
+            //Word boundaries matter here: `contains: "w"` matches every message
+            //holding the letter w - "watching", "wifi", "bro was" - so the "w"
+            //card would be noise. Prisma has no regex filter for Postgres, so
+            //this drops to raw SQL: ~* is case-insensitive, \y a word boundary.
+            const pattern = `\\y(${variants.map(escapeRegex).join("|")})\\y`
+            const messages = await ctx.db.$queryRaw<
+                { id: string; contentOffsetSeconds: number }[]
+            >`SELECT id, "contentOffsetSeconds"
+                FROM msgs
+               WHERE "vidId" = ${videoId.id}
+                 AND message ~* ${pattern}
+               ORDER BY "contentOffsetSeconds" ASC`
 
-
-            const keyword = escapeSpecialChars(input.keyword)
-            const video = await ctx.db.video.findUnique({
-                where: { id: videoId.id },
-                include: {
-                    comments: {
-                        where: {
-                            message: {
-                                contains: keyword,
-
-                            }
-                        },
-                        orderBy: {
-                            contentOffsetSeconds: "asc"
-                        },
-                    },
-                },
-            });
-
-
-
-            if (video?.comments.length === 0) {
-                // const updatedCarda = await ctx.db.term.delete({
-                //     where: {
-                //         id: emoteDb.id,
-                //     },
-                // })
-
+            if (messages.length === 0) {
                 return { message: "No comments found" }
             }
-            const messages = video?.comments;
             interface CommentCardCreate {
                 timestamp: string;
                 vidId: string;
@@ -87,7 +88,6 @@ export const commentRouter = createTRPCRouter({
             })
             const cardId = newCard.id
             const card: CommentCardCreate[] = [] as CommentCardCreate[];
-            if (!messages) return
             for (const message of messages) {
 
                 function timeCalc(sec: number) {
@@ -161,14 +161,17 @@ export const commentRouter = createTRPCRouter({
                 _max: { count: true },
             });
             if (!avgCount) return
-            if (!avgCount._sum.count || !emoteDb.Emote?.url2 || !avgCount._avg.count || !avgCount._min.count || !avgCount._max.count) return
+            if (!avgCount._sum.count || !avgCount._avg.count || !avgCount._min.count || !avgCount._max.count) return
 
             const a = {
                 sum: avgCount._sum.count,
                 avg: Math.round(avgCount._avg.count),
                 min: avgCount._min.count,
                 max: avgCount._max.count,
-                url: emoteDb.Emote.url1
+                //word cards have no image. This used to require emoteDb.Emote
+                //url2 to exist and bailed out otherwise; Cards.tsx already
+                //guards on url, so null renders as a plain card.
+                url: emoteDb?.Emote?.url1 ?? null
             }
 
             await ctx.db.card.update({

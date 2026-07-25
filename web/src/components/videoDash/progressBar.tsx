@@ -16,9 +16,11 @@ export const ProgressBar = ({ videoId }: { videoId: number }) => {
     {
       //stop polling once the job reaches a terminal state. React Query v5 hands
       //the callback the Query, not the data, so the status is read off state.
+      //matches the worker's progress write interval, so the bar advances in
+      //step with the job rather than in visible jumps
       refetchInterval: (query) => {
         const status = query.state.data?.status;
-        return status === "DONE" || status === "FAILED" ? false : 2000;
+        return status === "DONE" || status === "FAILED" ? false : 1000;
       },
       refetchOnWindowFocus: false,
     }

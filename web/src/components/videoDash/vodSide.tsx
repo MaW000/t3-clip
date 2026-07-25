@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { ProgressBar, CommentCards } from "@/components";
+import { ProgressBar, CommentCards, KeywordList } from "@/components";
 import type {
   Twitch,
   Card,
@@ -47,6 +47,7 @@ export const VodSide = ({
       className={`scrollbar-x relative mt-2 h-[60vh] w-full min-w-0 overflow-y-scroll rounded-lg bg-slate-700 text-center xl:col-start-10 xl:col-end-13 xl:row-span-full xl:mt-0 xl:h-[var(--vod-h)]`}
     >
       {completed && <ProgressBar videoId={videoId} />}
+      <KeywordList videoId={videoId} cards={cards} setCards={setCards} />
       <CommentCards
         playerRef={playerRef}
         cards={cards}

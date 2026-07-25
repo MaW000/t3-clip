@@ -22,15 +22,14 @@ export const cardRouter = createTRPCRouter({
           id: true,
         },
       });
-      if (!video) return;
-      const cards = await ctx.db.card.findMany({
+      //same reason as emote.getComments - undefined is not a legal query result
+      if (!video) return [];
+
+      return ctx.db.card.findMany({
         where: {
           vidId: video.id,
         },
       });
-      if (!cards) return;
-
-      return cards;
     }),
   getCard: publicProcedure
     .input(

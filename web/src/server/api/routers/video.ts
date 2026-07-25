@@ -111,6 +111,28 @@ export const videoRouter = createTRPCRouter({
       return { ...job, updatedAt };
     }),
 
+  /**
+   * The VOD's most-typed words, for the keyword list at the top of the sidebar.
+   * Written by the Python worker when indexing finishes - see worker/words.py
+   * for how spellings are folded together.
+   */
+  getKeywords: publicProcedure
+    .input(videoIdInput)
+    .query(async ({ ctx, input }) => {
+      const video = await ctx.db.video.findUnique({
+        where: { videoId: BigInt(input.videoId) },
+        select: { id: true },
+      });
+      //not indexed yet - an empty list, never undefined
+      if (!video) return [];
+
+      return ctx.db.keyword.findMany({
+        where: { vidId: video.id },
+        orderBy: { amount: "desc" },
+        select: { key: true, label: true, amount: true },
+      });
+    }),
+
   getFive: publicProcedure.query(async ({ ctx }) => {
     const videos = await ctx.db.video.findMany({
       select: {

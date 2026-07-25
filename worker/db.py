@@ -404,6 +404,70 @@ class Database:
             )
             return cur.rowcount or 0
 
+    def iter_messages(self, video_db_id: str, batch: int = 5000) -> Iterable[str]:
+        """Every stored message for a video, streamed.
+
+        A server-side cursor rather than fetchall(): a long VOD has hundreds of
+        thousands of rows and the word count only needs one at a time.
+        """
+        conn = self.connect()
+        #A named cursor is a server-side portal, and Postgres only allows one
+        #inside a transaction. This connection is autocommit, so the block has
+        #to be opened explicitly. The name only has to be unique per connection
+        #and this runs one video at a time.
+        with conn.transaction(), conn.cursor(name="msg_stream") as cur:
+            cur.itersize = batch
+            cur.execute(
+                'SELECT message FROM msgs WHERE "vidId" = %s', (video_db_id,)
+            )
+            for row in cur:
+                yield row["message"]
+
+    def replace_keywords(
+        self, video_db_id: str, rows: Sequence[dict[str, Any]]
+    ) -> int:
+        """Swap in a fresh top-words list for a video.
+
+        Delete then insert rather than upsert: a re-run can push a word out of
+        the top N, and an upsert would leave the stale row behind forever.
+        """
+        with self.connect().cursor() as cur:
+            cur.execute('DELETE FROM keywords WHERE "vidId" = %s', (video_db_id,))
+            if not rows:
+                return 0
+
+            cur.executemany(
+                """
+                INSERT INTO keywords (id, "vidId", key, label, variants, amount)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT ("vidId", key) DO UPDATE
+                    SET label    = EXCLUDED.label,
+                        variants = EXCLUDED.variants,
+                        amount   = EXCLUDED.amount
+                """,
+                [
+                    (
+                        new_id(),
+                        video_db_id,
+                        row["key"],
+                        row["label"],
+                        row["variants"],
+                        row["amount"],
+                    )
+                    for row in rows
+                ],
+            )
+            return cur.rowcount or 0
+
+    def emote_names(self, channel_id: str) -> set[str]:
+        """Emote names this channel uses, so they can be kept out of the word
+        list - the emote carousel already shows them."""
+        with self.connect().cursor() as cur:
+            cur.execute(
+                'SELECT term FROM terms WHERE "channelId" = %s', (channel_id,)
+            )
+            return {row["term"] for row in cur.fetchall()}
+
     def mark_video_complete(self, video_db_id: str) -> None:
         with self.connect().cursor() as cur:
             cur.execute(

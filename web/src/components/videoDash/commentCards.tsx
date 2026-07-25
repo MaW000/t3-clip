@@ -19,8 +19,8 @@ export const CommentCards = ({
   return (
     <div className="my-2 mx-2 flex  flex-col gap-2 md:ml-0 md:mr-2 ">
       {cards?.map((card: Card) => {
-        if (!card.url) return;
-
+        //word cards carry no image, unlike emote cards. This used to skip any
+        //card without a url, which would have hidden every keyword card.
         if (!card.timestamps) {
           return (
             <CardEle

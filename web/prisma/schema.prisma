@@ -138,11 +138,35 @@ model Video {
     comments     Msg[]
     Cards        Card[]
     commentCards CommentCard[]
+    keywords     Keyword[]
 
     complete Boolean @default(false)
     Channel  Channel @relation(fields: [channelId], references: [id])
 
     @@map("videos")
+}
+
+/// The most-typed words in one VOD's chat, written by the Python worker once a
+/// job finishes. Spellings of the same word are folded together, so "wwwww",
+/// "ww" and "w" are one row - see worker/words.py for the normalisation.
+model Keyword {
+    id    String @id @default(cuid())
+    vidId String
+    /// normalised group key, e.g. "lol"
+    key   String
+    /// the most common real spelling in the group, which is what the UI shows.
+    /// The key "col" displays as "cool".
+    label String
+    /// every surface form folded into this group. Tap-to-timestamps matches on
+    /// these, so asking for "lol" also finds "lmao", "lul" and "haha".
+    variants String[]
+    amount   Int
+
+    Video Video @relation(fields: [vidId], references: [id])
+
+    @@unique([vidId, key])
+    @@index([vidId, amount])
+    @@map("keywords")
 }
 
 model Hashtag {
