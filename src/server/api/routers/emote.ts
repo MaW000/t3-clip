@@ -15,6 +15,7 @@ export const emoteRouter = createTRPCRouter({
       });
       if (!channel) return;
 
+      //the emote comes back with the term, so there is no per-term follow-up query
       const topTerms = await ctx.prisma.term.findMany({
         where: {
           channelId: channel.channelId,
@@ -23,37 +24,24 @@ export const emoteRouter = createTRPCRouter({
           amount: "desc",
         },
         take: 50,
+        include: {
+          Emote: true,
+        },
       });
-      const topTermsWithEmotes = await Promise.all(
-        topTerms.map(async (term) => {
-          const termWithEmote = await ctx.prisma.term.findUnique({
-            where: {
-              emojiId: term.emojiId,
-            },
-            include: {
-              Emote: true,
-            },
-          });
-          return termWithEmote;
-        })
-      );
-      const terms = topTermsWithEmotes;
-      const filteredData = terms?.filter((term) => term?.Emote);
-      const mappedData = filteredData
-        ?.map((term) => {
-          if (term === null) return null;
-          if (term?.Emote === null) return null;
-          if (!term.Emote.url1 || !term.Emote.url2 || !term.Emote.url3)
-            return null;
-          return {
+
+      return topTerms.flatMap((term) => {
+        const emote = term.Emote;
+        if (!emote) return [];
+        const url = emote.url1 ?? emote.url2 ?? emote.url3;
+        if (!url) return [];
+        return [
+          {
             term: term.term,
             amount: term.amount,
-            url: term.Emote.url1 || term.Emote.url2 || term.Emote.url3,
-            emojiId: term.Emote.emojiId,
-          };
-        })
-        .filter((term) => term !== null);
-
-      return mappedData;
+            url,
+            emojiId: emote.emojiId,
+          },
+        ];
+      });
     }),
 });

@@ -52,15 +52,30 @@ export const cardRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.commentCard.findMany({
+      const cards = await ctx.prisma.commentCard.findMany({
         where: {
           cardId: input.cardId,
           timestamp: input.timestamp,
         },
-        include: {
-          messages: true,
-        },
       });
+      if (cards.length === 0) return [];
+
+      //msgIds is a scalar list rather than a relation, so the messages are
+      //resolved in a second query and stitched back on to keep the old shape.
+      const messages = await ctx.prisma.msg.findMany({
+        where: { id: { in: cards.flatMap((card) => card.msgIds) } },
+        orderBy: { contentOffsetSeconds: "asc" },
+      });
+      const byId = new Map(messages.map((message) => [message.id, message]));
+
+      return cards.map((card) => ({
+        ...card,
+        messages: card.msgIds
+          .map((id) => byId.get(id))
+          .filter((message): message is (typeof messages)[number] =>
+            Boolean(message)
+          ),
+      }));
     }),
   likeCard: protectedProcedure
     .input(

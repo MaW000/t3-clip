@@ -41,7 +41,7 @@ export const EmoteCards = ({
   };
 
   return (
-    <div className={`scrollbar-x mx-5 flex gap-3 overflow-x-auto bg-slate-600`}>
+    <div className={`scrollbar-x mx-2 flex min-w-0 gap-3 overflow-x-auto bg-slate-600 sm:mx-5`}>
       {updatedTerms?.map((term) => {
         const commas = term.amount
           .toString()

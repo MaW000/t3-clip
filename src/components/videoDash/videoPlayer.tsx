@@ -24,16 +24,44 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
   const response = videoSaveRes.data;
   const [player, setPlayer] = useState<Twitch | null>(null);
   const [cards, setCards] = useState<Card[]>([]);
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const { data: queryData } = api.card.getCards.useQuery({
     videoId: videoId,
   });
-  
+
+  // Re-measure on resize / rotate so the embed isn't stuck at its first size.
+  useEffect(() => {
+    const measure = () => {
+      const el = playerRef.current;
+      if (!el) return;
+      setContainerWidth((prev) =>
+        Math.abs(el.clientWidth - prev) > 20 ? el.clientWidth : prev
+      );
+    };
+    measure();
+
+    let timer: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(measure, 200);
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, []);
+
   useEffect(() => {
     const twitch: TwitchObject = (window as MyWindow).Twitch || {};
-    if (!playerRef.current?.clientWidth) return;
+    if (!containerWidth) return;
     if (!twitch.Player) return
-    const w = playerRef.current.clientWidth - 50;
+    // The 50px gutter only exists in the xl side-by-side layout.
+    const gutter = window.innerWidth >= 1280 ? 50 : 0;
+    const w = containerWidth - gutter;
     const h = (9 / 16) * w;
     const options: PlayerOptions = {
       width: w,
@@ -57,15 +85,15 @@ export const VideoDash = ({ videoId }: { videoId: number }) => {
         initPlayer.destroy();
       }
     };
-  }, [videoId, queryData]);
+  }, [videoId, queryData, containerWidth]);
 
   return (
     <div className="relative">
-      <div className="mx-5 bg-slate-700 xl:grid xl:grid-cols-12">
+      <div className="mx-0 bg-slate-700 sm:mx-5 xl:grid xl:grid-cols-12">
         <div
           id="player"
           ref={playerRef}
-          className=" col-span-9 col-start-1  row-span-full  "
+          className=" w-full xl:col-span-9 xl:col-start-1  xl:row-span-full  "
         ></div>
 
         <VodSide

@@ -23,13 +23,13 @@ export const LikedCards = ({recentCards}: {recentCards: Comment[]}) => {
             <div
               key={i}
               className={
-                " flex rounded-md border-4 border-slate-900 bg-slate-700 p-2 ml-2 drop-shadow-lg"
+                " flex flex-wrap items-center rounded-md border-4 border-slate-900 bg-slate-700 p-2 md:ml-2 drop-shadow-lg"
               }
-            >   
-            {card.card.url && <Image src={card.card.url} height={50} width={50} alt="url" />}
-            <h1 className="mt-3 mx-2 text-purple-400">{card.card.keyword}</h1>
-            <h1 className="mt-3 mx-2">{card.minute}</h1>
-            <Link href={`/video/${card.video.videoId}`} className="text-blue-400 mt-3 mx-2 underline underline-offset-2">{card.timestamp}</Link>
+            >
+            {card.card.url && <Image src={card.card.url} height={50} width={50} alt="url" className="shrink-0" />}
+            <h1 className="mx-2 text-purple-400">{card.card.keyword}</h1>
+            <h1 className="mx-2">{card.minute}</h1>
+            <Link href={`/video/${card.video.videoId}`} className="text-blue-400 mx-2 underline underline-offset-2">{card.timestamp}</Link>
             <Image src={thumbnail} height={50} width={80} alt="video" className="hidden" />
             </div>
           );

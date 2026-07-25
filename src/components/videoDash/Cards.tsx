@@ -56,9 +56,9 @@ export const CardEle = ({
           handleHideTimestamps();
         }
       }}
-      className="flex w-full grow items-center rounded-t-xl border-2 border-black bg-slate-900 p-2 py-3"
+      className="flex w-full grow flex-wrap items-center gap-y-10 rounded-t-xl border-2 border-black bg-slate-900 p-2 py-3 md:flex-nowrap md:gap-y-0"
     >
-      <div className="relative mb-5 h-10 w-14">
+      <div className="relative mb-5 h-10 w-14 shrink-0">
         {card.url && (
           <Image
             src={card.url}
@@ -68,8 +68,8 @@ export const CardEle = ({
           />
         )}
       </div>
-      <div className="ml-auto mr-5 mb-3 flex">
-        <div className="relative mr-20  h-10 w-20">
+      <div className="ml-auto mb-3 flex gap-6 md:mr-5 md:gap-0">
+        <div className="relative  h-10 w-20 md:mr-20">
           <label className="labelCardsH">Likes</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
@@ -80,18 +80,18 @@ export const CardEle = ({
             {card.likes}
           </h1>
         </div>
-        <div className="relative ml-auto  h-10 w-20">
+        <div className="relative  h-10 w-20 md:ml-auto">
           <label className="labelCardsH">Keyword</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1
-            className={`float-right  font-bold  text-purple-500 ${
+            className={`float-right w-full truncate text-right  font-bold  text-purple-500 ${
               card.keyword.length > 20 ? "text-xl" : "text-xl"
             }`}
           >
             {card.keyword}
           </h1>
         </div>
-        <div className="relative ml-7 h-10 w-10">
+        <div className="relative h-10 w-10 md:ml-7">
           <label className="labelCardsH">Interval</label>
           <div className="absolute -bottom-2 left-1/2 h-[.1rem] w-[200%] -translate-x-1/2 transform bg-periwinkle-gray-500" />
           <h1 className="  justify-center align-middle text-xl font-bold text-purple-500">
@@ -100,7 +100,7 @@ export const CardEle = ({
         </div>
       </div>
 
-      <div className="mr-5 grid grid-cols-2 -mb-5">
+      <div className="ml-auto -mb-5 grid grid-cols-2 md:mr-5 md:ml-0">
         <div className="relative float-right w-16 justify-end">
           <label className="labelCards">Min:</label>
           <h1
@@ -243,8 +243,8 @@ export const Timestamps = ({
   const id = session.data?.user.id;
   
   return (
-    <div key={timestamp.id} className={`relative flex justify-center gap-5 pt-7`}>
-      <div className="relative float-left mr-14 justify-end">
+    <div key={timestamp.id} className={`relative flex flex-wrap justify-center gap-x-3 gap-y-6 pt-7 pr-8 md:flex-nowrap md:gap-5 md:pr-0`}>
+      <div className="relative float-left mr-6 justify-end md:mr-14">
         <label className="labelCards w-[90%] pb-5  text-sm">Timestamp:</label>
         <button
           onClick={() => player?.seek(timestamp.contentOffsetSeconds)}
@@ -262,7 +262,7 @@ export const Timestamps = ({
         </h1>
       </div>
       {!id ? (
-        <button className="relative ml-10 text-red-500" disabled>
+        <button className="relative ml-4 text-red-500 md:ml-10" disabled>
           {" "}
           <label className="labelCards mr-10 w-full pb-5 text-sm">Likes:</label>
           <h1 className="mb-5 justify-start text-left text-lg text-purple-500">
@@ -271,7 +271,7 @@ export const Timestamps = ({
         </button>
       ) : timestamp.liked.includes(id) ? (
         <button
-          className="relative ml-10 text-red-500"
+          className="relative ml-4 text-red-500 md:ml-10"
           onClick={() => {
             handleDisLike.mutate({
               cardId: timestamp.id,
@@ -287,7 +287,7 @@ export const Timestamps = ({
         </button>
       ) : (
         <button
-          className="relative ml-10 text-blue-500"
+          className="relative ml-4 text-blue-500 md:ml-10"
           onClick={() => {
             handleLikes.mutate({
               cardId: timestamp.id,
@@ -396,7 +396,7 @@ export const TimestampFilter = ({
   }
 
   return (
-    <div className=" space-x-20 text-center text-lg  text-blue-400 ">
+    <div className=" space-x-8 text-center text-lg  text-blue-400 md:space-x-20 ">
       <button className=" underline" onClick={() => sortCardsByCount("time")}>
         Time
       </button>

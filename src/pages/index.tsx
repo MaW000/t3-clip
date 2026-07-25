@@ -13,18 +13,18 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="max-h-screen min-h-screen">
+      <main className="min-h-screen">
         <HeaderMain toggleSearch={false} />
         <div className="">
           <div className=" flex select-none flex-col items-center  ">
-            <h1 className="text-6xl font-semibold text-purple-400 hover:cursor-pointer md:text-9xl">
+            <h1 className="text-center text-5xl font-semibold text-purple-400 hover:cursor-pointer sm:text-6xl md:text-9xl">
               <span className="text-periwinkle-gray-500">Next</span>.Clip
             </h1>
           </div>
-          <div className="mt-12 flex justify-center">
-      {videoThumbs && videoThumbs.length >= 1 && 
+          <div className="mt-8 flex justify-center md:mt-12">
+      {videoThumbs && videoThumbs.length >= 1 &&
             <div
-              className={` mt-10 mx-5 flex-wrap flex gap-4 rounded-lg bg-slate-500 p-2  `}
+              className={` mt-10 mx-4 flex flex-wrap justify-center gap-4 rounded-lg bg-slate-500 p-2  `}
             >
               
               <VodThumbnails videos={videoThumbs} />

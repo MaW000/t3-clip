@@ -40,8 +40,8 @@ export const VodSide = ({
  
   return (
     <div
-      style={{ height: x }}
-      className={`scrollbar-x relative mr-12 ml-10 2xl:-ml-10 2xl:mr-0 2xl:col-start-10 2xl:col-end-13 row-span-full -ml-10 overflow-y-scroll rounded-lg bg-slate-700 text-center`}
+      style={{ "--vod-h": `${x}px` } as React.CSSProperties}
+      className={`scrollbar-x relative mt-2 h-[60vh] w-full min-w-0 overflow-y-scroll rounded-lg bg-slate-700 text-center xl:col-start-10 xl:col-end-13 xl:row-span-full xl:mt-0 xl:h-[var(--vod-h)]`}
     >
       {completed && <ProgressBar videoId={videoId} />}
       <CommentCards

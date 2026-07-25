@@ -26,7 +26,7 @@ const VideoPage: NextPage = () => {
           setToggle(true);
         }}
       />
-      <main className="max-h-screen min-h-screen ">
+      <main className="min-h-screen ">
         <HeaderMain toggleSearch={true} />
         {toggle && <VideoDash videoId={videoId} />}
       </main>

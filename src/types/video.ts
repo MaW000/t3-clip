@@ -62,29 +62,44 @@ export interface VideoResponse {
         requestID: string;
     };
 }
-export interface TwitchVideo {
-    id: string;
-    user_id: string;
-    stream_id: string;
+/** Raw shape of the public gql.twitch.tv `video(id:)` query. Needs no API key. */
+export interface GqlVideoResponse {
+    data: {
+        video: {
+            id: string;
+            title: string;
+            lengthSeconds: number;
+            viewCount: number;
+            createdAt: string;
+            previewThumbnailURL: string;
+            language: string;
+            description: string | null;
+            owner: {
+                login: string;
+                displayName: string;
+            } | null;
+        } | null;
+    };
+}
+
+/**
+ * Video metadata normalised to the field names the rest of the pipeline uses.
+ * Field names intentionally mirror the old Helix payload so `createVideo` and the
+ * thumbnail components did not have to change.
+ */
+export interface VideoMeta {
     user_name: string;
     title: string;
     description: string;
     created_at: string;
-    published_at: string;
     url: string;
     thumbnail_url: string;
-    viewable: string;
     view_count: number;
     language: string;
-    type: string;
+    /** Helix-style display string, e.g. "9h13m35s". Stored on Video.duration. */
     duration: string;
-    muted_segments: null;
-}
-export interface TwitchVideoResponse {
-    data: TwitchVideo[];
-    pagination: {
-        cursor: string;
-    };
+    /** Exact length from Twitch. Use this for arithmetic, never parse `duration`. */
+    lengthSeconds: number;
 }
 export interface TermDataInput {
     term: string;

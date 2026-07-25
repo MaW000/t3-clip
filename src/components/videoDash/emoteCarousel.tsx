@@ -16,7 +16,7 @@ export const EmoteCarousel = ({
   const terms = a.data as Term[];
 
   return (
-    <div className={`mx-5 flex rounded-b-xl bg-slate-600 pb-2`} id="container">
+    <div className={`mx-0 flex min-w-0 rounded-b-xl bg-slate-600 pb-2 sm:mx-5`} id="container">
       <EmoteCards
         terms={terms}
         videoId={videoId}

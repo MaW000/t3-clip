@@ -31,7 +31,6 @@ export interface Timestamp {
 export interface Message {
     id: string;
     vidId: string;
-    cardIds: string[];
     message: string;
     commentId: string;
     commenter: string | null;
